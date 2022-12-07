@@ -29,11 +29,22 @@ public class AuthController {
             return;
         }
 
+        User user;
         try {
-            User user = userService.getUser(login);
-            TradeOrganizationApp.setUser(user);
-        } catch (SQLException | NoUserByLoginException exception) {
+            user = userService.getUser(login);
+        } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).show();
+            return;
+        } catch (NoUserByLoginException exception) {
+            new Alert(Alert.AlertType.INFORMATION, "Такого пользователя не существует в системе", ButtonType.OK).show();
+            return;
         }
+
+        if (!user.getPassword().equals(password)) {
+            new Alert(Alert.AlertType.INFORMATION, "Пароль указан неверно", ButtonType.OK).show();
+            return;
+        }
+
+        TradeOrganizationApp.setUser(user);
     }
 }
