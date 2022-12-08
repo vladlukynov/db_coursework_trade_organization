@@ -1,6 +1,7 @@
 package com.coursework.app.repository;
 
 import com.coursework.app.entity.User;
+import com.coursework.app.service.RoleService;
 import com.coursework.app.utils.DBConstants;
 
 import java.sql.*;
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserRepository {
+    private final RoleService roleService = new RoleService();
+
     public List<User> getUsers() throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBConstants.URL);
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM Users");
@@ -20,7 +23,7 @@ public class UserRepository {
                         resultSet.getString("FirstName"),
                         resultSet.getString("LastName"),
                         resultSet.getString("MiddleName"),
-                        resultSet.getInt("RoleId"),
+                        roleService.getRole(resultSet.getInt("RoleId")),
                         resultSet.getBoolean("IsActive")));
             }
 

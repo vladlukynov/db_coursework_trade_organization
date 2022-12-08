@@ -6,16 +6,16 @@ public class User {
     private final String firstName;
     private final String lastName;
     private final String middleName;
-    private final int roleId;
+    private final Role role;
     private final boolean isActive;
 
-    public User(String userLogin, String password, String firstName, String lastName, String middleName, int roleId, boolean isActive) {
+    public User(String userLogin, String password, String firstName, String lastName, String middleName, Role role, boolean isActive) {
         this.userLogin = userLogin;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.middleName = middleName;
-        this.roleId = roleId;
+        this.role = role;
         this.isActive = isActive;
     }
 
@@ -39,11 +39,24 @@ public class User {
         return middleName;
     }
 
-    public int getRoleId() {
-        return roleId;
+    public Role getRole() {
+        return role;
     }
 
     public boolean isActive() {
         return isActive;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userLogin='" + userLogin + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", middleName='" + middleName + '\'' +
+                ", role=" + role +
+                ", isActive=" + isActive +
+                '}';
     }
 }
