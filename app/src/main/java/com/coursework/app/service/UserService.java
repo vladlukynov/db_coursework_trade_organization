@@ -26,4 +26,12 @@ public class UserService {
 
         throw new NoUserByLoginException("Not find user by login " + userLogin);
     }
+
+    public void setActiveStatus(String userLogin, int status) throws SQLException {
+        userRepository.setActiveStatus(userLogin, status);
+    }
+
+    public void addUser(User user) throws SQLException {
+        userRepository.addUser(user);
+    }
 }

@@ -12,9 +12,9 @@ public class UserRepository {
     private final RoleService roleService = new RoleService();
 
     public List<User> getUsers() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBConstants.URL);
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Users");
-             ResultSet resultSet = statement.executeQuery()) {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM Users");
+            ResultSet resultSet = statement.executeQuery();
             List<User> users = new ArrayList<>();
 
             while (resultSet.next()) {
@@ -28,6 +28,31 @@ public class UserRepository {
             }
 
             return users;
+        }
+    }
+
+    public void setActiveStatus(String userLogin, int status) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement("UPDATE Users SET IsActive=? WHERE UserLogin=?");
+            statement.setInt(1, status);
+            statement.setString(2, userLogin);
+            statement.execute();
+        }
+    }
+
+    public void addUser(User user) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO Users (UserLogin, Password, FirstName, LastName, MiddleName, RoleId, IsActive) VALUES (?,?,?,?,?,?,?)");
+            statement.setString(1, user.getUserLogin());
+            statement.setString(2, user.getPassword());
+            statement.setString(3, user.getFirstName());
+            statement.setString(4, user.getLastName());
+            statement.setString(5, user.getMiddleName());
+            statement.setInt(6, user.getRole().getRoleId());
+            statement.setBoolean(7, user.getIsActive());
+
+            statement.execute();
         }
     }
 }

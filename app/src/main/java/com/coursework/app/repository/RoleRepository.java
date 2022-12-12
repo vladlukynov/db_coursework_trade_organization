@@ -9,9 +9,9 @@ import java.util.List;
 
 public class RoleRepository {
     public List<Role> getRoles() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBConstants.URL);
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Roles");
-             ResultSet resultSet = statement.executeQuery()) {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM Roles");
+            ResultSet resultSet = statement.executeQuery();
             List<Role> roles = new ArrayList<>();
 
             while (resultSet.next()) {
