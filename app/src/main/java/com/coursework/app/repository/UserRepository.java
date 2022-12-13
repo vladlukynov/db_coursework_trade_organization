@@ -1,15 +1,15 @@
 package com.coursework.app.repository;
 
 import com.coursework.app.entity.User;
-import com.coursework.app.service.RoleService;
 import com.coursework.app.utils.DBConstants;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class UserRepository {
-    private final RoleService roleService = new RoleService();
+    private final RoleRepository roleRepository = new RoleRepository();
 
     public List<User> getUsers() throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
@@ -23,12 +23,18 @@ public class UserRepository {
                         resultSet.getString("FirstName"),
                         resultSet.getString("LastName"),
                         resultSet.getString("MiddleName"),
-                        roleService.getRole(resultSet.getInt("RoleId")),
+                        roleRepository.getRole(resultSet.getInt("RoleId")),
                         resultSet.getBoolean("IsActive")));
             }
 
             return users;
         }
+    }
+
+    public User getUser(String userLogin) throws SQLException {
+        List<User> users = getUsers();
+        Optional<User> optionalUser = users.stream().filter(user -> user.getUserLogin().equals(userLogin)).findFirst();
+        return optionalUser.orElse(null);
     }
 
     public void setActiveStatus(String userLogin, int status) throws SQLException {

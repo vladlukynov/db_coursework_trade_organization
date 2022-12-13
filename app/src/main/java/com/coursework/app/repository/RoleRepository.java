@@ -6,6 +6,7 @@ import com.coursework.app.utils.DBConstants;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class RoleRepository {
     public List<Role> getRoles() throws SQLException {
@@ -20,5 +21,11 @@ public class RoleRepository {
             }
             return roles;
         }
+    }
+
+    public Role getRole(int roleId) throws SQLException {
+        List<Role> roles = getRoles();
+        Optional<Role> optionalRole = roles.stream().filter(role -> role.getRoleId() == roleId).findFirst();
+        return optionalRole.orElse(null);
     }
 }

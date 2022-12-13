@@ -1,10 +1,9 @@
 package com.coursework.app.view.admin;
 
 import com.coursework.app.TradeOrganizationApp;
-import com.coursework.app.entity.Product;
-import com.coursework.app.entity.Role;
-import com.coursework.app.entity.User;
+import com.coursework.app.entity.*;
 import com.coursework.app.service.ProductService;
+import com.coursework.app.service.SupplierService;
 import com.coursework.app.service.UserService;
 import com.coursework.app.utils.StringConverterUtils;
 import com.coursework.app.utils.ViewUtils;
@@ -20,6 +19,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class AdminController {
+    // Окно сотрудники
     @FXML
     private TableView<User> employeeTable;
     @FXML
@@ -34,10 +34,23 @@ public class AdminController {
     private TableColumn<User, Role> roleColumn;
     @FXML
     private TableColumn<User, Boolean> isActiveColumn;
+    // Окно товары
     @FXML
     private TableView<Product> productsTable;
     @FXML
     private TableColumn<Product, String> productNameColumn;
+
+    // Окно поставщики
+    @FXML
+    private ComboBox<Supplier> supplierBox;
+    @FXML
+    private TableView<SupplierProduct> supplierProductsTable;
+    @FXML
+    private TableColumn<SupplierProduct, Product> supplierProductNameColumn;
+    @FXML
+    private TableColumn<SupplierProduct, Double> supplierProductPriceColumn;
+
+    // Окно аккаунт
     @FXML
     private ComboBox<String> employeeStatusBox;
     @FXML
@@ -49,31 +62,50 @@ public class AdminController {
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
     private final ObservableList<Product> products = FXCollections.observableArrayList();
+    private final ObservableList<SupplierProduct> supplierProducts = FXCollections.observableArrayList();
     private final UserService userService = new UserService();
     private final ProductService productService = new ProductService();
+    private final SupplierService supplierService = new SupplierService();
 
     @FXML
     protected void initialize() {
-        loginColumn.setCellValueFactory(new PropertyValueFactory<>("userLogin"));
-        firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-        lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-        middleNameColumn.setCellValueFactory(new PropertyValueFactory<>("middleName"));
-        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-        roleColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.roleStringConverter));
-        isActiveColumn.setCellValueFactory(new PropertyValueFactory<>("isActive"));
-        isActiveColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.accountActiveStringConverter));
-        employeeTable.setItems(users);
+        try {
+            loginColumn.setCellValueFactory(new PropertyValueFactory<>("userLogin"));
+            firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+            lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+            middleNameColumn.setCellValueFactory(new PropertyValueFactory<>("middleName"));
+            roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+            roleColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.roleStringConverter));
+            isActiveColumn.setCellValueFactory(new PropertyValueFactory<>("isActive"));
+            isActiveColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.accountActiveStringConverter));
+            employeeTable.setItems(users);
 
-        productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
-        productsTable.setItems(products);
+            productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
+            productsTable.setItems(products);
 
-        employeeStatusBox.getItems().addAll("Не уволенные", "Уволенные");
-        employeeStatusBox.getSelectionModel().selectFirst();
-        employeeStatusBox.setOnAction(event -> updateEmployeesPage());
+            supplierProductNameColumn.setCellValueFactory(new PropertyValueFactory<>("product"));
+            supplierProductNameColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productNameStringConverter));
+            supplierProductPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+            supplierProductsTable.setItems(supplierProducts);
 
-        ViewControllers.setAdminController(this);
+            employeeStatusBox.getItems().addAll("Не уволенные", "Уволенные");
+            employeeStatusBox.getSelectionModel().selectFirst();
+            employeeStatusBox.setOnAction(event -> updateEmployeesPage());
 
-        fullUpdate();
+            supplierService.getSuppliers().forEach(supplier -> {
+                if (supplier.getIsActive()) {
+                    supplierBox.getItems().add(supplier);
+                    supplierBox.setOnAction(event -> updateSuppliersPage());
+                }
+            });
+            supplierBox.setConverter(StringConverterUtils.supplierNameStringConverter);
+
+            ViewControllers.setAdminController(this);
+
+            fullUpdate();
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
     }
 
     @FXML
@@ -95,17 +127,7 @@ public class AdminController {
         }
     }
 
-    @FXML
-    protected void onExitButtonClick() {
-        try {
-            TradeOrganizationApp.setUser(null);
-            ViewUtils.openWindow("auth/auth-view.fxml", "Авторизация",
-                    ViewUtils.getStage(loginLabel), true);
-        } catch (IOException exception) {
-            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
-        }
-    }
-
+    // Окно товары
     @FXML
     protected void onAddProductButtonClick() {
         try {
@@ -125,6 +147,39 @@ public class AdminController {
                 updateProductsPage();
             }
         } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    // Окно поставщики
+    @FXML
+    protected void onAddSupplierClick() {
+
+    }
+
+    @FXML
+    protected void onDeleteSupplierClick() {
+
+    }
+
+    @FXML
+    void onSupplierProductAddClick() {
+
+    }
+
+    @FXML
+    void onSupplierProductDeleteClick() {
+
+    }
+
+    // Окно аккаунт
+    @FXML
+    protected void onExitButtonClick() {
+        try {
+            TradeOrganizationApp.setUser(null);
+            ViewUtils.openWindow("auth/auth-view.fxml", "Авторизация",
+                    ViewUtils.getStage(loginLabel), true);
+        } catch (IOException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }
@@ -152,14 +207,6 @@ public class AdminController {
         }
     }
 
-    private void updateAccountPage() {
-        loginLabel.setText("Логин: " + TradeOrganizationApp.getUser().getUserLogin());
-        nameLabel.setText("ФИО: " + TradeOrganizationApp.getUser().getLastName() + " " +
-                TradeOrganizationApp.getUser().getFirstName() + " " +
-                TradeOrganizationApp.getUser().getMiddleName());
-        roleLabel.setText("Роль: " + TradeOrganizationApp.getUser().getRole().getRoleName());
-    }
-
     private void updateProductsPage() {
         try {
             products.clear();
@@ -174,9 +221,35 @@ public class AdminController {
         }
     }
 
+    private void updateAccountPage() {
+        loginLabel.setText("Логин: " + TradeOrganizationApp.getUser().getUserLogin());
+        nameLabel.setText("ФИО: " + TradeOrganizationApp.getUser().getLastName() + " " +
+                TradeOrganizationApp.getUser().getFirstName() + " " +
+                TradeOrganizationApp.getUser().getMiddleName());
+        roleLabel.setText("Роль: " + TradeOrganizationApp.getUser().getRole().getRoleName());
+    }
+
+    private void updateSuppliersPage() {
+        try {
+            supplierProducts.clear();
+            Supplier supplier = supplierBox.getSelectionModel().getSelectedItem();
+            if (supplier != null) {
+                supplierService.getSupplierProducts(supplier.getSupplierId())
+                    .forEach(supplierProduct -> {
+                    if (supplierProduct.getProduct().getIsActive()) {
+                        supplierProducts.add(supplierProduct);
+                    }
+                });
+            }
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
     public void fullUpdate() {
-        updateAccountPage();
         updateEmployeesPage();
         updateProductsPage();
+        updateSuppliersPage();
+        updateAccountPage();
     }
 }

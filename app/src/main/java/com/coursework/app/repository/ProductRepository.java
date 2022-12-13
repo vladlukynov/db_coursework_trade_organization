@@ -6,6 +6,7 @@ import com.coursework.app.utils.DBConstants;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ProductRepository {
     public List<Product> getProducts() throws SQLException {
@@ -21,6 +22,12 @@ public class ProductRepository {
             }
             return products;
         }
+    }
+
+    public Product getProduct(int productId) throws SQLException {
+        List<Product> products = getProducts();
+        Optional<Product> optionalProduct = products.stream().filter(product -> product.getProductId() == productId).findFirst();
+        return optionalProduct.orElse(null);
     }
 
     public void addProduct(Product product) throws SQLException {

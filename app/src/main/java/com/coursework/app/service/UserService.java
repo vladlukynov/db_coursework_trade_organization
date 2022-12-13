@@ -6,7 +6,6 @@ import com.coursework.app.repository.UserRepository;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 public class UserService {
     private final UserRepository userRepository = new UserRepository();
@@ -16,12 +15,10 @@ public class UserService {
     }
 
     public User getUser(String userLogin) throws SQLException, NoUserByLoginException {
-        List<User> users = userRepository.getUsers();
+        User user = userRepository.getUser(userLogin);
 
-        Optional<User> optionalUser = users.stream().filter(user -> user.getUserLogin().equals(userLogin)).findFirst();
-
-        if (optionalUser.isPresent()) {
-            return optionalUser.get();
+        if (user != null) {
+            return user;
         }
 
         throw new NoUserByLoginException("Not find user by login " + userLogin);

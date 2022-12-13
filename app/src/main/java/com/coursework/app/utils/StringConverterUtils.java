@@ -1,6 +1,8 @@
 package com.coursework.app.utils;
 
+import com.coursework.app.entity.Product;
 import com.coursework.app.entity.Role;
+import com.coursework.app.entity.Supplier;
 import javafx.util.StringConverter;
 
 public class StringConverterUtils {
@@ -24,6 +26,30 @@ public class StringConverterUtils {
 
         @Override
         public Boolean fromString(String s) {
+            return null;
+        }
+    };
+
+    public static StringConverter<Product> productNameStringConverter = new StringConverter<>() {
+        @Override
+        public String toString(Product product) {
+            return product.getProductName();
+        }
+
+        @Override
+        public Product fromString(String s) {
+            return null;
+        }
+    };
+
+    public static StringConverter<Supplier> supplierNameStringConverter = new StringConverter<>() {
+        @Override
+        public String toString(Supplier supplier) {
+            return supplier.getSupplierName();
+        }
+
+        @Override
+        public Supplier fromString(String s) {
             return null;
         }
     };
