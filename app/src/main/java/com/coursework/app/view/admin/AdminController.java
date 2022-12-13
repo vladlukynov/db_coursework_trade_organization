@@ -39,6 +39,8 @@ public class AdminController {
     @FXML
     private TableColumn<Product, String> productNameColumn;
     @FXML
+    private ComboBox<String> employeeStatusBox;
+    @FXML
     private Label loginLabel;
     @FXML
     private Label nameLabel;
@@ -46,7 +48,7 @@ public class AdminController {
     private Label roleLabel;
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
-    private final ObservableList<Product> products =FXCollections.observableArrayList();
+    private final ObservableList<Product> products = FXCollections.observableArrayList();
     private final UserService userService = new UserService();
     private final ProductService productService = new ProductService();
 
@@ -65,11 +67,13 @@ public class AdminController {
         productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
         productsTable.setItems(products);
 
+        employeeStatusBox.getItems().addAll("Не уволенные", "Уволенные");
+        employeeStatusBox.getSelectionModel().selectFirst();
+        employeeStatusBox.setOnAction(event -> updateEmployeesPage());
+
         ViewControllers.setAdminController(this);
 
-        updateAccountPage();
-        updateEmployeesPage();
-        updateProductsPage();
+        fullUpdate();
     }
 
     @FXML
@@ -104,7 +108,25 @@ public class AdminController {
 
     @FXML
     protected void onAddProductButtonClick() {
+        try {
+            ViewUtils.openWindow("admin/add-product-view.fxml", "Добавление наименования продукта",
+                    ViewUtils.getStage(loginLabel), false);
+        } catch (IOException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
 
+    @FXML
+    protected void onDeleteProductButtonClick() {
+        try {
+            Product product = productsTable.getSelectionModel().getSelectedItem();
+            if (product != null) {
+                productService.changeProductStatus(product.getProductId(), false);
+                updateProductsPage();
+            }
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
     }
 
     private void dismissUser(String login) {
@@ -119,7 +141,12 @@ public class AdminController {
     private void updateEmployeesPage() {
         try {
             users.clear();
-            users.addAll(userService.getUsers());
+            if (employeeStatusBox.getSelectionModel().isSelected(0)) {
+                users.addAll(userService.getUsers().stream().filter(User::getIsActive).toList());
+            } else {
+                users.addAll(userService.getUsers().stream().filter(user -> !user.getIsActive()).toList());
+            }
+            users.sort((o1, o2) -> o1.getLastName().compareToIgnoreCase(o2.getLastName()));
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
@@ -136,7 +163,12 @@ public class AdminController {
     private void updateProductsPage() {
         try {
             products.clear();
-            products.addAll(productService.getProducts());
+            productService.getProducts().forEach(product -> {
+                if (product.getIsActive()) {
+                    products.add(product);
+                }
+            });
+            products.sort((o1, o2) -> o1.getProductName().compareToIgnoreCase(o2.getProductName()));
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }

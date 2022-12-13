@@ -12,4 +12,12 @@ public class ProductService {
     public List<Product> getProducts() throws SQLException {
         return productRepository.getProducts();
     }
+
+    public void addProduct(Product product) throws SQLException {
+        productRepository.addProduct(product);
+    }
+
+    public void changeProductStatus(int productId, boolean status) throws SQLException {
+        productRepository.changeActiveStatus(productId, status);
+    }
 }

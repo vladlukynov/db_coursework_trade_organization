@@ -88,8 +88,9 @@ CREATE TABLE Sellers
 -- Таблица продаж
 CREATE TABLE Transactions
 (
-    TransactionId INTEGER PRIMARY KEY AUTOINCREMENT,
-    SellerLogin   TEXT NOT NULL,
+    TransactionId   INTEGER PRIMARY KEY AUTOINCREMENT,
+    SellerLogin     TEXT NOT NULL,
+    TransactionDate TEXT NOT NULL,
     FOREIGN KEY (SellerLogin) REFERENCES Sellers (UserLogin)
 );
 
@@ -108,7 +109,8 @@ CREATE TABLE Consumers
 CREATE TABLE Products
 (
     ProductId   INTEGER PRIMARY KEY AUTOINCREMENT,
-    ProductName TEXT NOT NULL
+    ProductName TEXT    NOT NULL,
+    IsActive    INTEGER NOT NULL CHECK ( IsActive = 0 OR IsActive = 1 )
 );
 
 -- Заявки
