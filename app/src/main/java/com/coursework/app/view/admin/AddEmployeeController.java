@@ -6,11 +6,11 @@ import com.coursework.app.service.RoleService;
 import com.coursework.app.service.UserService;
 import com.coursework.app.utils.StringConverterUtils;
 import com.coursework.app.utils.ViewUtils;
+import com.coursework.app.view.ViewControllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
 public class AddEmployeeController {
@@ -40,12 +40,7 @@ public class AddEmployeeController {
 
     @FXML
     protected void onCancelButtonClick() {
-        try {
-            ViewUtils.createStage("admin/admin-view.fxml", "Администратор",
-                    ViewUtils.getStage(loginField));
-        } catch (IOException exception) {
-            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
-        }
+        ViewUtils.getStage(loginField).close();
     }
 
     @FXML
@@ -68,9 +63,11 @@ public class AddEmployeeController {
 
             password = DigestUtils.md5Hex(password);
             userService.addUser(new User(login, password, name[1], name[0], name[2], role, true));
-            ViewUtils.createStage("admin/admin-view.fxml", "Администратор",
-                    ViewUtils.getStage(loginField));
-        } catch (SQLException | IOException exception) {
+
+            ViewControllers.getAdminController().fullUpdate();
+
+            ViewUtils.getStage(loginField).close();
+        } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }

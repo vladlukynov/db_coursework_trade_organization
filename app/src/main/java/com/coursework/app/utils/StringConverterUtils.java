@@ -19,7 +19,7 @@ public class StringConverterUtils {
     public static StringConverter<Boolean> accountActiveStringConverter = new StringConverter<>() {
         @Override
         public String toString(Boolean isActive) {
-            return isActive ? "-" : "+";
+            return isActive ? "Нет" : "Да";
         }
 
         @Override

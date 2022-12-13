@@ -1,11 +1,14 @@
 package com.coursework.app.view.admin;
 
 import com.coursework.app.TradeOrganizationApp;
+import com.coursework.app.entity.Product;
 import com.coursework.app.entity.Role;
 import com.coursework.app.entity.User;
+import com.coursework.app.service.ProductService;
 import com.coursework.app.service.UserService;
 import com.coursework.app.utils.StringConverterUtils;
 import com.coursework.app.utils.ViewUtils;
+import com.coursework.app.view.ViewControllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -32,6 +35,10 @@ public class AdminController {
     @FXML
     private TableColumn<User, Boolean> isActiveColumn;
     @FXML
+    private TableView<Product> productsTable;
+    @FXML
+    private TableColumn<Product, String> productNameColumn;
+    @FXML
     private Label loginLabel;
     @FXML
     private Label nameLabel;
@@ -39,7 +46,9 @@ public class AdminController {
     private Label roleLabel;
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
+    private final ObservableList<Product> products =FXCollections.observableArrayList();
     private final UserService userService = new UserService();
+    private final ProductService productService = new ProductService();
 
     @FXML
     protected void initialize() {
@@ -53,8 +62,14 @@ public class AdminController {
         isActiveColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.accountActiveStringConverter));
         employeeTable.setItems(users);
 
+        productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        productsTable.setItems(products);
+
+        ViewControllers.setAdminController(this);
+
         updateAccountPage();
-        updateEmployeeTable();
+        updateEmployeesPage();
+        updateProductsPage();
     }
 
     @FXML
@@ -62,15 +77,15 @@ public class AdminController {
         User user = employeeTable.getSelectionModel().getSelectedItem();
         if (user != null) {
             dismissUser(user.getUserLogin());
-            updateEmployeeTable();
+            updateEmployeesPage();
         }
     }
 
     @FXML
     protected void onRegisterEmployeeButtonClick() {
         try {
-            ViewUtils.createStage("admin/add-employee-view.fxml", "Регистрация сотрудника",
-                    ViewUtils.getStage(employeeTable));
+            ViewUtils.openWindow("admin/add-employee-view.fxml", "Регистрация сотрудника",
+                    ViewUtils.getStage(employeeTable), false);
         } catch (IOException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
@@ -80,17 +95,31 @@ public class AdminController {
     protected void onExitButtonClick() {
         try {
             TradeOrganizationApp.setUser(null);
-            ViewUtils.createStage("auth/auth-view.fxml", "Авторизация",
-                    ViewUtils.getStage(loginLabel));
+            ViewUtils.openWindow("auth/auth-view.fxml", "Авторизация",
+                    ViewUtils.getStage(loginLabel), true);
         } catch (IOException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }
 
+    @FXML
+    protected void onAddProductButtonClick() {
+
+    }
+
     private void dismissUser(String login) {
         try {
             userService.setActiveStatus(login, 0);
-            updateEmployeeTable();
+            updateEmployeesPage();
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    private void updateEmployeesPage() {
+        try {
+            users.clear();
+            users.addAll(userService.getUsers());
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
@@ -104,12 +133,18 @@ public class AdminController {
         roleLabel.setText("Роль: " + TradeOrganizationApp.getUser().getRole().getRoleName());
     }
 
-    private void updateEmployeeTable() {
+    private void updateProductsPage() {
         try {
-            users.clear();
-            users.addAll(userService.getUsers());
+            products.clear();
+            products.addAll(productService.getProducts());
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
+    }
+
+    public void fullUpdate() {
+        updateAccountPage();
+        updateEmployeesPage();
+        updateProductsPage();
     }
 }

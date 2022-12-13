@@ -16,7 +16,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-import static com.coursework.app.utils.ViewUtils.createStage;
+import static com.coursework.app.utils.ViewUtils.openWindow;
 
 public class AuthController {
     private final UserService userService = new UserService();
@@ -58,7 +58,12 @@ public class AuthController {
 
         TradeOrganizationApp.setUser(user);
         try {
-            createStage("admin/admin-view.fxml", "Администратор", ViewUtils.getStage(loginField));
+            switch (user.getRole().getRoleName()) {
+                case "Администратор" ->
+                        openWindow("admin/admin-view.fxml", "Администратор", ViewUtils.getStage(loginField),
+                                true);
+                default -> System.out.println("Другие роли в разработке");
+            }
         } catch (IOException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }

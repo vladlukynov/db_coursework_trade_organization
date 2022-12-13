@@ -16,4 +16,5 @@ module com.coursework.app {
     exports com.coursework.app.utils;
     exports com.coursework.app.view.auth;
     exports com.coursework.app.view.admin;
+    exports com.coursework.app.view;
 }

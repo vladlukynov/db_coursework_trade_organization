@@ -46,17 +46,4 @@ public class User {
     public boolean getIsActive() {
         return isActive;
     }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "userLogin='" + userLogin + '\'' +
-                ", password='" + password + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", middleName='" + middleName + '\'' +
-                ", role=" + role +
-                ", isActive=" + isActive +
-                '}';
-    }
 }

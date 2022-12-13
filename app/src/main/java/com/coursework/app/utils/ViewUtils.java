@@ -13,14 +13,16 @@ public class ViewUtils {
         return (Stage) node.getScene().getWindow();
     }
 
-    public static void createStage(String view, String title, Stage oldStage) throws IOException {
+    public static void openWindow(String view, String title, Stage oldStage, boolean closeCurrentWindow) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(TradeOrganizationApp.class.getResource(view));
         Scene scene = new Scene(fxmlLoader.load());
         Stage stage = new Stage();
         stage.setTitle(title);
         stage.setResizable(false);
         stage.setScene(scene);
-        oldStage.close();
+        if (closeCurrentWindow) {
+            oldStage.close();
+        }
         stage.show();
     }
 }
