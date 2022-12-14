@@ -14,7 +14,7 @@ public class SupplierRepository {
 
     public List<Supplier> getSuppliers() throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM SuppliersProducts");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM Suppliers");
             ResultSet resultSet = statement.executeQuery();
             List<Supplier> suppliers = new ArrayList<>();
             while (resultSet.next()) {
@@ -45,6 +45,37 @@ public class SupplierRepository {
                         resultSet.getDouble("Price")));
             }
             return list;
+        }
+    }
+
+    public void addSupplier(Supplier supplier) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO Suppliers (SupplierName, IsActive) VALUES (?,?)");
+            statement.setString(1, supplier.getSupplierName());
+            statement.setBoolean(2, supplier.getIsActive());
+            statement.execute();
+        }
+    }
+
+    public void changeSupplierStatus(int supplierId, boolean status) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE Suppliers SET IsActive=? WHERE SupplierId=?");
+            statement.setBoolean(1, status);
+            statement.setInt(2, supplierId);
+            statement.execute();
+        }
+    }
+
+    public void addSupplierProduct(int supplierId, int productId, double price) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO SuppliersProducts (SupplierId, ProductId, Price) VALUES (?,?,?)");
+            statement.setInt(1, supplierId);
+            statement.setInt(2, productId);
+            statement.setDouble(3, price);
+            statement.execute();
         }
     }
 }

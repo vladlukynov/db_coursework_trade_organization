@@ -25,7 +25,7 @@ public class AddProductController {
         }
         try {
             productService.addProduct(new Product(name, true));
-            ViewControllers.getAdminController().fullUpdate();
+            ViewControllers.getAdminController().updateProductsPage();
             ViewUtils.getStage(nameField).close();
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK);

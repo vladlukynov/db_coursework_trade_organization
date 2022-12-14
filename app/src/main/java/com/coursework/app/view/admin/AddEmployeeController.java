@@ -64,7 +64,7 @@ public class AddEmployeeController {
             password = DigestUtils.md5Hex(password);
             userService.addUser(new User(login, password, name[1], name[0], name[2], role, true));
 
-            ViewControllers.getAdminController().fullUpdate();
+            ViewControllers.getAdminController().updateEmployeesPage();
 
             ViewUtils.getStage(loginField).close();
         } catch (SQLException exception) {

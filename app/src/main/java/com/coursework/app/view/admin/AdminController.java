@@ -63,49 +63,46 @@ public class AdminController {
     private final ObservableList<User> users = FXCollections.observableArrayList();
     private final ObservableList<Product> products = FXCollections.observableArrayList();
     private final ObservableList<SupplierProduct> supplierProducts = FXCollections.observableArrayList();
+    private final ObservableList<Supplier> supplierBoxItems = FXCollections.observableArrayList();
     private final UserService userService = new UserService();
     private final ProductService productService = new ProductService();
     private final SupplierService supplierService = new SupplierService();
 
     @FXML
     protected void initialize() {
-        try {
-            loginColumn.setCellValueFactory(new PropertyValueFactory<>("userLogin"));
-            firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-            lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-            middleNameColumn.setCellValueFactory(new PropertyValueFactory<>("middleName"));
-            roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-            roleColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.roleStringConverter));
-            isActiveColumn.setCellValueFactory(new PropertyValueFactory<>("isActive"));
-            isActiveColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.accountActiveStringConverter));
-            employeeTable.setItems(users);
+        loginColumn.setCellValueFactory(new PropertyValueFactory<>("userLogin"));
+        firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        middleNameColumn.setCellValueFactory(new PropertyValueFactory<>("middleName"));
+        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+        roleColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.roleStringConverter));
+        isActiveColumn.setCellValueFactory(new PropertyValueFactory<>("isActive"));
+        isActiveColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.accountActiveStringConverter));
+        employeeTable.setItems(users);
 
-            productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
-            productsTable.setItems(products);
+        productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        productsTable.setItems(products);
 
-            supplierProductNameColumn.setCellValueFactory(new PropertyValueFactory<>("product"));
-            supplierProductNameColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productNameStringConverter));
-            supplierProductPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-            supplierProductsTable.setItems(supplierProducts);
+        supplierProductNameColumn.setCellValueFactory(new PropertyValueFactory<>("product"));
+        supplierProductNameColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productNameStringConverter));
+        supplierProductPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        supplierProductsTable.setItems(supplierProducts);
 
-            employeeStatusBox.getItems().addAll("Не уволенные", "Уволенные");
-            employeeStatusBox.getSelectionModel().selectFirst();
-            employeeStatusBox.setOnAction(event -> updateEmployeesPage());
+        employeeStatusBox.getItems().addAll("Не уволенные", "Уволенные");
+        employeeStatusBox.getSelectionModel().selectFirst();
+        employeeStatusBox.setOnAction(event -> updateEmployeesPage());
 
-            supplierService.getSuppliers().forEach(supplier -> {
-                if (supplier.getIsActive()) {
-                    supplierBox.getItems().add(supplier);
-                    supplierBox.setOnAction(event -> updateSuppliersPage());
-                }
-            });
-            supplierBox.setConverter(StringConverterUtils.supplierNameStringConverter);
+        supplierBox.setItems(supplierBoxItems);
+        supplierBox.setConverter(StringConverterUtils.supplierNameStringConverter);
+        supplierBox.setOnAction(event -> updateSuppliersPage());
 
-            ViewControllers.setAdminController(this);
+        ViewControllers.setAdminController(this);
 
-            fullUpdate();
-        } catch (SQLException exception) {
-            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
-        }
+        initializeSupplierBox();
+        updateEmployeesPage();
+        updateProductsPage();
+        updateSuppliersPage();
+        updateAccountPage();
     }
 
     @FXML
@@ -154,21 +151,39 @@ public class AdminController {
     // Окно поставщики
     @FXML
     protected void onAddSupplierClick() {
-
+        try {
+            ViewUtils.openWindow("admin/add-supplier-view.fxml", "Добавить поставщика",
+                    ViewUtils.getStage(loginLabel), false);
+        } catch (IOException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
     }
 
     @FXML
     protected void onDeleteSupplierClick() {
-
+        try {
+            Supplier supplier = supplierBox.getSelectionModel().getSelectedItem();
+            if (supplier != null) {
+                supplierService.changeSupplierStatus(supplier.getSupplierId(), false);
+                updateSuppliersPage();
+            }
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
     }
 
     @FXML
-    void onSupplierProductAddClick() {
-
+    protected void onSupplierProductAddClick() {
+        try {
+            ViewUtils.openWindow("admin/add-supplier-product-view.fxml", "Добавить товар",
+                    ViewUtils.getStage(loginLabel), false);
+        } catch (IOException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
     }
 
     @FXML
-    void onSupplierProductDeleteClick() {
+    protected void onSupplierProductDeleteClick() {
 
     }
 
@@ -193,7 +208,7 @@ public class AdminController {
         }
     }
 
-    private void updateEmployeesPage() {
+    public void updateEmployeesPage() {
         try {
             users.clear();
             if (employeeStatusBox.getSelectionModel().isSelected(0)) {
@@ -207,7 +222,7 @@ public class AdminController {
         }
     }
 
-    private void updateProductsPage() {
+    public void updateProductsPage() {
         try {
             products.clear();
             productService.getProducts().forEach(product -> {
@@ -221,7 +236,7 @@ public class AdminController {
         }
     }
 
-    private void updateAccountPage() {
+    public void updateAccountPage() {
         loginLabel.setText("Логин: " + TradeOrganizationApp.getUser().getUserLogin());
         nameLabel.setText("ФИО: " + TradeOrganizationApp.getUser().getLastName() + " " +
                 TradeOrganizationApp.getUser().getFirstName() + " " +
@@ -229,27 +244,38 @@ public class AdminController {
         roleLabel.setText("Роль: " + TradeOrganizationApp.getUser().getRole().getRoleName());
     }
 
-    private void updateSuppliersPage() {
+    public void updateSuppliersPage() {
         try {
             supplierProducts.clear();
             Supplier supplier = supplierBox.getSelectionModel().getSelectedItem();
             if (supplier != null) {
                 supplierService.getSupplierProducts(supplier.getSupplierId())
-                    .forEach(supplierProduct -> {
-                    if (supplierProduct.getProduct().getIsActive()) {
-                        supplierProducts.add(supplierProduct);
-                    }
-                });
+                        .forEach(supplierProduct -> {
+                            if (supplierProduct.getProduct().getIsActive()) {
+                                supplierProducts.add(supplierProduct);
+                            }
+                        });
             }
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }
 
-    public void fullUpdate() {
-        updateEmployeesPage();
-        updateProductsPage();
-        updateSuppliersPage();
-        updateAccountPage();
+    public void initializeSupplierBox() {
+        try {
+            supplierBoxItems.clear();
+
+            supplierService.getSuppliers().forEach(supplier -> {
+                if (supplier.getIsActive()) {
+                    supplierBoxItems.add(supplier);
+                }
+            });
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    public Supplier getSelectedSupplier() {
+        return supplierBox.getSelectionModel().getSelectedItem();
     }
 }

@@ -17,4 +17,16 @@ public class SupplierService {
     public List<SupplierProduct> getSupplierProducts(int supplierId) throws SQLException {
         return supplierRepository.getSupplierProducts(supplierId);
     }
+
+    public void addSupplier(Supplier supplier) throws SQLException {
+        supplierRepository.addSupplier(supplier);
+    }
+
+    public void changeSupplierStatus(int supplierId, boolean status) throws SQLException {
+        supplierRepository.changeSupplierStatus(supplierId, status);
+    }
+
+    public void addSupplierProduct(int supplierId, int productId, double price) throws SQLException {
+        supplierRepository.addSupplierProduct(supplierId, productId, price);
+    }
 }
