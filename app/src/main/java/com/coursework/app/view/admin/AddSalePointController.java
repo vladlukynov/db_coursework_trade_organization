@@ -17,6 +17,8 @@ import java.sql.SQLException;
 
 public class AddSalePointController {
     @FXML
+    private TextField salePointNameField;
+    @FXML
     private TextField comServ;
 
     @FXML
@@ -45,13 +47,14 @@ public class AddSalePointController {
 
     @FXML
     protected void addButtonClick() {
+        String name = salePointNameField.getText().trim();
         SalePointType salePointType = type.getSelectionModel().getSelectedItem();
         double pointSize;
         double rental;
         double communalService;
         int countersNumber;
-        if (salePointType == null) {
-            new Alert(Alert.AlertType.INFORMATION, "Выберите тип точки", ButtonType.OK).showAndWait();
+        if (salePointType == null || name.isBlank()) {
+            new Alert(Alert.AlertType.INFORMATION, "Тип точки или название не введены", ButtonType.OK).showAndWait();
             return;
         }
         try {
@@ -64,7 +67,7 @@ public class AddSalePointController {
             return;
         }
         try {
-            salePointService.addSalePoint(new SalePoint(salePointType, pointSize, rental, communalService, countersNumber, true));
+            salePointService.addSalePoint(new SalePoint(name, salePointType, pointSize, rental, communalService, countersNumber, true));
             ViewControllers.getAdminController().updateSalePointPage();
             ViewUtils.getStage(rentalPrice).close();
         } catch (SQLException exception) {

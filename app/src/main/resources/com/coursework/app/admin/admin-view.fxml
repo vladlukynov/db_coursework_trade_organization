@@ -151,6 +151,7 @@
                   </HBox>
                   <TableView fx:id="salePointsTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <columns>
+                        <TableColumn fx:id="salePointNameColumn" prefWidth="75.0" text="Название" />
                       <TableColumn fx:id="salePointTypeColumn" prefWidth="75.0" text="Тип" />
                       <TableColumn fx:id="salePointSizeColumn" prefWidth="75.0" text="Размер помещения" />
                         <TableColumn fx:id="salePointRentalColumn" prefWidth="75.0" text="Арендная плата" />
@@ -170,7 +171,29 @@
       </Tab>
       <Tab text="Залы">
         <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            <VBox alignment="TOP_CENTER" spacing="10.0">
+               <children>
+                  <HBox alignment="TOP_CENTER" spacing="30.0">
+                     <children>
+                        <ComboBox fx:id="salePointBox" prefWidth="150.0" promptText="Торговая точка" />
+                        <Button mnemonicParsing="false" onAction="#onHallDeleteButtonClick" text="Удалить" />
+                        <Button mnemonicParsing="false" onAction="#onHallAddButtonClick" text="Добавить зал" />
+                     </children>
+                  </HBox>
+                  <TableView fx:id="hallsTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                    <columns>
+                      <TableColumn fx:id="hallNameColumn" prefWidth="75.0" text="Название зала" />
+                      <TableColumn fx:id="hallSalePointNameColumn" prefWidth="75.0" text="Торговая точка" />
+                    </columns>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                  </TableView>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </VBox>
         </content>
       </Tab>
       <Tab text="Секции">

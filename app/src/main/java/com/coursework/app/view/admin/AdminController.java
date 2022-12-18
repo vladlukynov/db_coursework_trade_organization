@@ -2,10 +2,7 @@ package com.coursework.app.view.admin;
 
 import com.coursework.app.TradeOrganizationApp;
 import com.coursework.app.entity.*;
-import com.coursework.app.service.ProductService;
-import com.coursework.app.service.SalePointService;
-import com.coursework.app.service.SupplierService;
-import com.coursework.app.service.UserService;
+import com.coursework.app.service.*;
 import com.coursework.app.utils.StringConverterUtils;
 import com.coursework.app.utils.ViewUtils;
 import com.coursework.app.view.ViewControllers;
@@ -55,6 +52,8 @@ public class AdminController {
     @FXML
     private TableView<SalePoint> salePointsTable;
     @FXML
+    private TableColumn<SalePoint, String> salePointNameColumn;
+    @FXML
     private TableColumn<SalePoint, SalePointType> salePointTypeColumn;
     @FXML
     private TableColumn<SalePoint, Double> salePointSizeColumn;
@@ -64,6 +63,16 @@ public class AdminController {
     private TableColumn<SalePoint, Double> comServColumn;
     @FXML
     private TableColumn<SalePoint, Integer> countersColumn;
+
+    // Окно залы
+    @FXML
+    private TableView<Hall> hallsTable;
+    @FXML
+    private TableColumn<Hall, String> hallNameColumn;
+    @FXML
+    private TableColumn<Hall, SalePoint> hallSalePointNameColumn;
+    @FXML
+    private ComboBox<SalePoint> salePointBox;
 
     // Окно аккаунт
     @FXML
@@ -79,11 +88,14 @@ public class AdminController {
     private final ObservableList<Product> products = FXCollections.observableArrayList();
     private final ObservableList<SupplierProduct> supplierProducts = FXCollections.observableArrayList();
     private final ObservableList<SalePoint> salePoints = FXCollections.observableArrayList();
+    private final ObservableList<Hall> halls = FXCollections.observableArrayList();
     private final ObservableList<Supplier> supplierBoxItems = FXCollections.observableArrayList();
+    private final ObservableList<SalePoint> salePointBoxItems = FXCollections.observableArrayList();
     private final UserService userService = new UserService();
     private final ProductService productService = new ProductService();
     private final SupplierService supplierService = new SupplierService();
-    private final SalePointService salePointSerivce = new SalePointService();
+    private final SalePointService salePointService = new SalePointService();
+    private final HallService hallService = new HallService();
 
     @FXML
     protected void initialize() {
@@ -109,6 +121,7 @@ public class AdminController {
         supplierProductsTable.setItems(supplierProducts);
 
         // Торговые точки
+        salePointNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         salePointTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         salePointTypeColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.salePointTypeStringConverter));
         salePointSizeColumn.setCellValueFactory(new PropertyValueFactory<>("pointSize"));
@@ -117,23 +130,39 @@ public class AdminController {
         countersColumn.setCellValueFactory(new PropertyValueFactory<>("counters"));
         salePointsTable.setItems(salePoints);
 
+        // Залы
+        hallNameColumn.setCellValueFactory(new PropertyValueFactory<>("hallName"));
+        hallSalePointNameColumn.setCellValueFactory(new PropertyValueFactory<>("salePoint"));
+        hallSalePointNameColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.salePointNameStringConverter));
+        hallsTable.setItems(halls);
+
         // Инициализируем все Combobox
+        // Сотрудники
         employeeStatusBox.getItems().addAll("Не уволенные", "Уволенные");
         employeeStatusBox.getSelectionModel().selectFirst();
         employeeStatusBox.setOnAction(event -> updateEmployeesPage());
 
+        // Поставщики
         supplierBox.setItems(supplierBoxItems);
         supplierBox.setConverter(StringConverterUtils.supplierNameStringConverter);
         supplierBox.setOnAction(event -> updateSuppliersPage());
 
+        // Торговые точки
+        salePointBox.setItems(salePointBoxItems);
+        salePointBox.setConverter(StringConverterUtils.salePointNameStringConverter);
+        salePointBox.setOnAction(event -> updateHallsPage());
+
         ViewControllers.setAdminController(this);
 
         initializeSupplierBox();
+        initializeSalePointsBox();
+
         updateEmployeesPage();
         updateProductsPage();
         updateSuppliersPage();
         updateAccountPage();
         updateSalePointPage();
+        updateHallsPage();
     }
 
     @FXML
@@ -246,7 +275,7 @@ public class AdminController {
         try {
             SalePoint salePoint = salePointsTable.getSelectionModel().getSelectedItem();
             if (salePoint != null) {
-                salePointSerivce.changeStatus(salePoint.getSalePointId(), false);
+                salePointService.changeStatus(salePoint.getSalePointId(), false);
                 updateSalePointPage();
             }
         } catch (SQLException exception) {
@@ -254,6 +283,32 @@ public class AdminController {
         }
     }
 
+    // Окно залы
+    @FXML
+    protected void onHallDeleteButtonClick() {
+        try {
+            Hall hall = hallsTable.getSelectionModel().getSelectedItem();
+
+            if (hall != null) {
+                hallService.changeHallStatus(hall.getHallId(), false);
+                updateHallsPage();
+            }
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    @FXML
+    protected void onHallAddButtonClick() {
+        try {
+            ViewUtils.openWindow("admin/add-hall-view.fxml", "Добавить зал",
+                    ViewUtils.getStage(loginLabel), false);
+        } catch (IOException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    // Отдельные методы
     private void dismissUser(String login) {
         try {
             userService.setActiveStatus(login, 0);
@@ -319,11 +374,27 @@ public class AdminController {
     public void updateSalePointPage() {
         try {
             salePoints.clear();
-            salePointSerivce.getSalePoints().forEach(point -> {
+            salePointService.getSalePoints().forEach(point -> {
                 if (point.getIsActive()) {
                     salePoints.add(point);
                 }
             });
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    public void updateHallsPage() {
+        try {
+            halls.clear();
+            SalePoint point = salePointBox.getSelectionModel().getSelectedItem();
+            if (point != null) {
+                hallService.getHalls().forEach(hall -> {
+                    if (hall.isActive() && hall.getSalePoint().getSalePointId() == point.getSalePointId()) {
+                        halls.add(hall);
+                    }
+                });
+            }
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
@@ -343,7 +414,25 @@ public class AdminController {
         }
     }
 
+    public void initializeSalePointsBox() {
+        try {
+            salePointBoxItems.clear();
+
+            salePointService.getSalePoints().forEach(point -> {
+                if (point.getIsActive()) {
+                    salePointBoxItems.add(point);
+                }
+            });
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
     public Supplier getSelectedSupplier() {
         return supplierBox.getSelectionModel().getSelectedItem();
+    }
+
+    public SalePoint getSelectedSalePoint() {
+        return salePointBox.getSelectionModel().getSelectedItem();
     }
 }

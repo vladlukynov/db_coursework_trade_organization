@@ -1,9 +1,6 @@
 package com.coursework.app.utils;
 
-import com.coursework.app.entity.Product;
-import com.coursework.app.entity.Role;
-import com.coursework.app.entity.SalePointType;
-import com.coursework.app.entity.Supplier;
+import com.coursework.app.entity.*;
 import javafx.util.StringConverter;
 
 public class StringConverterUtils {
@@ -63,6 +60,18 @@ public class StringConverterUtils {
 
         @Override
         public SalePointType fromString(String s) {
+            return null;
+        }
+    };
+
+    public static StringConverter<SalePoint> salePointNameStringConverter = new StringConverter<>() {
+        @Override
+        public String toString(SalePoint salePoint) {
+            return salePoint.getName();
+        }
+
+        @Override
+        public SalePoint fromString(String s) {
             return null;
         }
     };

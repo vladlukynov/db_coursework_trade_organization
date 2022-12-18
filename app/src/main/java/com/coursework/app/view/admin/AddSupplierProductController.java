@@ -59,9 +59,12 @@ public class AddSupplierProductController {
         }
         try {
             Supplier supplier = ViewControllers.getAdminController().getSelectedSupplier();
-            if (supplier != null) {
-                supplierService.addSupplierProduct(supplier.getSupplierId(), product.getProductId(), price);
+            if (supplier == null) {
+                new Alert(Alert.AlertType.INFORMATION, "На главном окне не выбран поставщик", ButtonType.OK).showAndWait();
+                ViewUtils.getStage(priceField).close();
+                return;
             }
+            supplierService.addSupplierProduct(supplier.getSupplierId(), product.getProductId(), price);
             ViewControllers.getAdminController().updateSuppliersPage();
             ViewUtils.getStage(priceField).close();
         } catch (SQLException exception) {

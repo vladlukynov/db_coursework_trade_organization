@@ -18,6 +18,7 @@ public class SalePointRepository {
             List<SalePoint> salePoints = new ArrayList<>();
             while (resultSet.next()) {
                 salePoints.add(new SalePoint(resultSet.getInt("SalePointId"),
+                        resultSet.getString("SalePointName"),
                         salePointTypesRepository.getSalePointType(resultSet.getInt("TypeId")),
                         resultSet.getDouble("PointSize"),
                         resultSet.getDouble("RentalPrice"),
@@ -29,17 +30,23 @@ public class SalePointRepository {
         }
     }
 
+    public SalePoint getSalePointById(int id) throws SQLException {
+        List<SalePoint> points = getSalePoints();
+        return points.stream().filter(point -> point.getSalePointId() == id).findFirst().orElse(null);
+    }
+
     public void addSalePoint(SalePoint point) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
             PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO SalePoints (TypeId, PointSize, RentalPrice, СommunalService, CountersNumber, IsActive) " +
-                            "VALUES (?,?,?,?,?,?)");
-            statement.setInt(1, point.getType().getTypeId());
-            statement.setDouble(2, point.getPointSize());
-            statement.setDouble(3, point.getRentalPrice());
-            statement.setDouble(4, point.getComServ());
-            statement.setInt(5, point.getCounters());
-            statement.setBoolean(6, point.getIsActive());
+                    "INSERT INTO SalePoints (SalePointName, TypeId, PointSize, RentalPrice, СommunalService, CountersNumber, IsActive) " +
+                            "VALUES (?,?,?,?,?,?,?)");
+            statement.setString(1, point.getName());
+            statement.setInt(2, point.getType().getTypeId());
+            statement.setDouble(3, point.getPointSize());
+            statement.setDouble(4, point.getRentalPrice());
+            statement.setDouble(5, point.getComServ());
+            statement.setInt(6, point.getCounters());
+            statement.setBoolean(7, point.getIsActive());
             statement.execute();
         }
     }
