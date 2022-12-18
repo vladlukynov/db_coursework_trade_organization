@@ -1,5 +1,7 @@
 package com.coursework.app.repository;
 
+import com.coursework.app.entity.Seller;
+import com.coursework.app.entity.SuperVisor;
 import com.coursework.app.entity.User;
 import com.coursework.app.utils.DBConstants;
 
@@ -57,6 +59,32 @@ public class UserRepository {
             statement.setString(5, user.getMiddleName());
             statement.setInt(6, user.getRole().getRoleId());
             statement.setBoolean(7, user.getIsActive());
+
+            statement.execute();
+        }
+    }
+
+    public void addSuperVisor(SuperVisor superVisor) throws SQLException {
+        addUser(superVisor);
+
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO SuperVisors (UserLogin, SectionId) VALUES (?,?)");
+            statement.setString(1, superVisor.getUserLogin());
+            statement.setInt(2, superVisor.getSection().getSectionId());
+
+            statement.execute();
+        }
+    }
+
+    public void addSeller(Seller seller) throws SQLException {
+        addUser(seller);
+
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO Sellers (UserLogin, HallId) VALUES (?,?)");
+            statement.setString(1, seller.getUserLogin());
+            statement.setInt(2, seller.getHall().getHallId());
 
             statement.execute();
         }

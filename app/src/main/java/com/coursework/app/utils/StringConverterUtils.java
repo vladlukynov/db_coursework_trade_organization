@@ -75,4 +75,28 @@ public class StringConverterUtils {
             return null;
         }
     };
+
+    public static StringConverter<Hall> hallNameStringConverter = new StringConverter<>() {
+        @Override
+        public String toString(Hall hall) {
+            return hall.getHallName();
+        }
+
+        @Override
+        public Hall fromString(String s) {
+            return null;
+        }
+    };
+
+    public static StringConverter<Section> sectionNameStringConverter = new StringConverter<>() {
+        @Override
+        public String toString(Section section) {
+            return section.getSectionName();
+        }
+
+        @Override
+        public Section fromString(String s) {
+            return null;
+        }
+    };
 }

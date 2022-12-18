@@ -28,6 +28,21 @@ public class HallRepository {
         }
     }
 
+    public Hall getHall(int hallId) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT * FROM Halls WHERE HallId=?");
+            statement.setInt(1, hallId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new Hall(resultSet.getString("HallName"),
+                        salePointRepository.getSalePointById(resultSet.getInt("SalePointId")),
+                        resultSet.getBoolean("IsActive"));
+            }
+            return null;
+        }
+    }
+
     public void addHall(Hall hall) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
             PreparedStatement statement = connection.prepareStatement(
@@ -46,6 +61,23 @@ public class HallRepository {
             statement.setBoolean(1, status);
             statement.setInt(2, hallId);
             statement.execute();
+        }
+    }
+
+    public List<Hall> getHallsBySalePointId(int salePointId) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT * FROM Halls WHERE SalePointId = ?");
+            statement.setInt(1, salePointId);
+            ResultSet resultSet = statement.executeQuery();
+            List<Hall> list = new ArrayList<>();
+            while (resultSet.next()) {
+                list.add(new Hall(resultSet.getInt("HallId"),
+                        resultSet.getString("HallName"),
+                        salePointRepository.getSalePointById(resultSet.getInt("SalePointId")),
+                        resultSet.getBoolean("IsActive")));
+            }
+            return list;
         }
     }
 }

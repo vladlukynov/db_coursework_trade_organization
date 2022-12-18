@@ -20,4 +20,8 @@ public class HallService {
     public void changeHallStatus(int hallId, boolean status) throws SQLException {
         hallRepository.changeHallStatus(hallId, status);
     }
+
+    public List<Hall> getHallsBySalePointId(int salePointId) throws SQLException {
+        return hallRepository.getHallsBySalePointId(salePointId);
+    }
 }
