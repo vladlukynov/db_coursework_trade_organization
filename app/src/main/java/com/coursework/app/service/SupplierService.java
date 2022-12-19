@@ -26,7 +26,11 @@ public class SupplierService {
         supplierRepository.changeSupplierStatus(supplierId, status);
     }
 
-    public void addSupplierProduct(int supplierId, int productId, double price) throws SQLException {
-        supplierRepository.addSupplierProduct(supplierId, productId, price);
+    public void addSupplierProduct(int supplierId, int productId, double price, boolean isActive) throws SQLException {
+        supplierRepository.addSupplierProduct(supplierId, productId, price, isActive);
+    }
+
+    public void changeSupplierProductStatus(int supplierId, int productId, boolean status) throws SQLException {
+        supplierRepository.changeSupplierProductStatus(supplierId, productId, status);
     }
 }

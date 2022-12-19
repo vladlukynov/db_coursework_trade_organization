@@ -64,7 +64,7 @@ public class AddSupplierProductController {
                 ViewUtils.getStage(priceField).close();
                 return;
             }
-            supplierService.addSupplierProduct(supplier.getSupplierId(), product.getProductId(), price);
+            supplierService.addSupplierProduct(supplier.getSupplierId(), product.getProductId(), price, true);
             ViewControllers.getAdminController().updateSuppliersPage();
             ViewUtils.getStage(priceField).close();
         } catch (SQLException exception) {

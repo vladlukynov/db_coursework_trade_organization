@@ -35,14 +35,15 @@ public class SupplierRepository {
     public List<SupplierProduct> getSupplierProducts(int supplierId) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
             PreparedStatement statement = connection.prepareStatement(
-                    "SELECT ProductId, Price FROM SuppliersProducts WHERE SupplierId=?");
+                    "SELECT ProductId, Price, IsActive FROM SuppliersProducts WHERE SupplierId=?");
             statement.setInt(1, supplierId);
             ResultSet resultSet = statement.executeQuery();
             List<SupplierProduct> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(new SupplierProduct(getSupplier(supplierId),
                         productRepository.getProduct(resultSet.getInt("ProductId")),
-                        resultSet.getDouble("Price")));
+                        resultSet.getDouble("Price"),
+                        resultSet.getBoolean("IsActive")));
             }
             return list;
         }
@@ -68,13 +69,25 @@ public class SupplierRepository {
         }
     }
 
-    public void addSupplierProduct(int supplierId, int productId, double price) throws SQLException {
+    public void addSupplierProduct(int supplierId, int productId, double price, boolean isActive) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
             PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO SuppliersProducts (SupplierId, ProductId, Price) VALUES (?,?,?)");
+                    "INSERT INTO SuppliersProducts (SupplierId, ProductId, Price, IsActive) VALUES (?,?,?,?)");
             statement.setInt(1, supplierId);
             statement.setInt(2, productId);
             statement.setDouble(3, price);
+            statement.setBoolean(4, isActive);
+            statement.execute();
+        }
+    }
+
+    public void changeSupplierProductStatus(int supplierId, int productId, boolean status) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE SuppliersProducts SET IsActive=? WHERE SupplierId=? AND ProductId=?");
+            statement.setBoolean(1, status);
+            statement.setInt(2, supplierId);
+            statement.setInt(3, productId);
             statement.execute();
         }
     }

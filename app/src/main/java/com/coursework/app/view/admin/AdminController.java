@@ -244,7 +244,17 @@ public class AdminController {
 
     @FXML
     protected void onSupplierProductDeleteClick() {
-
+        try {
+            SupplierProduct product = supplierProductsTable.getSelectionModel().getSelectedItem();
+            Supplier supplier = supplierBox.getSelectionModel().getSelectedItem();
+            if (supplier != null && product != null) {
+                supplierService.changeSupplierProductStatus(supplier.getSupplierId(), product.getProduct().getProductId(),
+                        false);
+                updateSuppliersPage();
+            }
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
     }
 
     // Окно аккаунт
@@ -361,7 +371,7 @@ public class AdminController {
             if (supplier != null) {
                 supplierService.getSupplierProducts(supplier.getSupplierId())
                         .forEach(supplierProduct -> {
-                            if (supplierProduct.getProduct().getIsActive()) {
+                            if (supplierProduct.isActive() && supplierProduct.getProduct().getIsActive()) {
                                 supplierProducts.add(supplierProduct);
                             }
                         });
