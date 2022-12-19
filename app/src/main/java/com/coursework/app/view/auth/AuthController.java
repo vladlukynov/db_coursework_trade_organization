@@ -62,6 +62,8 @@ public class AuthController {
                 case "Администратор" ->
                         openWindow("admin/admin-view.fxml", "Администратор", ViewUtils.getStage(loginField),
                                 true);
+                case "Продавец" -> openWindow("seller/seller-view.fxml", "Продавец", ViewUtils.getStage(loginField),
+                        true);
                 default -> System.out.println("Другие роли в разработке");
             }
         } catch (IOException exception) {

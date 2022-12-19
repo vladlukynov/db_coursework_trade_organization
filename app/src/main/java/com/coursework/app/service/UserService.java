@@ -1,5 +1,6 @@
 package com.coursework.app.service;
 
+import com.coursework.app.entity.SalePoint;
 import com.coursework.app.entity.Seller;
 import com.coursework.app.entity.SuperVisor;
 import com.coursework.app.entity.User;
@@ -40,5 +41,13 @@ public class UserService {
 
     public void addSeller(Seller seller) throws SQLException {
         userRepository.addSeller(seller);
+    }
+
+    public SalePoint getSellerSalePoint(String sellerLogin) throws SQLException {
+        return userRepository.getSellerSalePoint(sellerLogin);
+    }
+
+    public Seller getSeller(String sellerLogin) throws SQLException {
+        return userRepository.getSeller(sellerLogin);
     }
 }
