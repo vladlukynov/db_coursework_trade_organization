@@ -36,7 +36,12 @@ public class SellerController {
 
     @FXML
     protected void createTransactionButton() {
-
+        try {
+            ViewUtils.openWindow("seller/add-transaction-view.fxml", "Добавление транзакции",
+                    ViewUtils.getStage(loginLabel), false);
+        } catch (IOException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
     }
 
     @FXML

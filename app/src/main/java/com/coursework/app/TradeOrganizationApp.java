@@ -1,7 +1,6 @@
 package com.coursework.app;
 
 import com.coursework.app.entity.User;
-import com.coursework.app.exception.NoUserByLoginException;
 import com.coursework.app.service.UserService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -18,10 +17,10 @@ public class TradeOrganizationApp extends Application {
     public void start(Stage stage) throws IOException {
         // FXMLLoader fxmlLoader = new FXMLLoader(TradeOrganizationApp.class.getResource("auth/auth-view.fxml"));
 
-        FXMLLoader fxmlLoader = new FXMLLoader(TradeOrganizationApp.class.getResource("admin/admin-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(TradeOrganizationApp.class.getResource("seller/seller-view.fxml"));
         try {
-            user = new UserService().getUser("admin");
-        } catch (SQLException | NoUserByLoginException exception) {
+            user = new UserService().getSeller("seller");
+        } catch (SQLException exception) {
             System.err.println(exception.getMessage());
         }
 

@@ -20,4 +20,16 @@ public class ProductService {
     public void changeProductStatus(int productId, boolean status) throws SQLException {
         productRepository.changeActiveStatus(productId, status);
     }
+
+    public List<Product> getSalePointProducts(int salePointId) throws SQLException {
+        return productRepository.getSalePointProducts(salePointId);
+    }
+
+    public int getSalePointProductQuantity(int salePointId, int productId) throws SQLException {
+        return productRepository.getSalePointProductQuantity(salePointId, productId);
+    }
+
+    public void changeProduct(int productId, int minusQuantity) throws SQLException {
+        productRepository.changeProduct(productId, minusQuantity);
+    }
 }

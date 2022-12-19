@@ -49,4 +49,48 @@ public class ProductRepository {
             statement.execute();
         }
     }
+
+    public List<Product> getSalePointProducts(int salePointId) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT Products.ProductId, Products.ProductName, Products.IsActive FROM ProductsSalePoints
+                        JOIN Products ON ProductsSalePoints.ProductId = Products.ProductId
+                    WHERE SalePointId = ?
+                    """);
+            statement.setInt(1, salePointId);
+            ResultSet resultSet = statement.executeQuery();
+            List<Product> list = new ArrayList<>();
+            while (resultSet.next()) {
+                list.add(new Product(resultSet.getInt("ProductId"),
+                        resultSet.getString("ProductName"),
+                        resultSet.getBoolean("IsActive")));
+            }
+            return list;
+        }
+    }
+
+    public int getSalePointProductQuantity(int salePointId, int productId) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT Quantity FROM ProductsSalePoints
+                    WHERE SalePointId = ? AND ProductId = ?
+                    """);
+            statement.setInt(1, salePointId);
+            statement.setInt(2, productId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("Quantity");
+            }
+            return 0;
+        }
+    }
+
+    public void changeProduct(int productId, int salePointId, int minusQuantity) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    UPDATE ProductsSalePoints SET Quantity=? WHERE ProductId=?
+                    """);
+
+        }
+    }
 }
