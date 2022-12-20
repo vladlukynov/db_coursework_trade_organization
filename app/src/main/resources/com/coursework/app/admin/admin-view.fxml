@@ -8,14 +8,13 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="482.0" prefWidth="797.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coursework.app.view.admin.AdminController">
   <tabs>
-    <Tab text="Сотрудники">
+    <Tab fx:id="employeeTab" onSelectionChanged="#employeeTabSelected" text="Сотрудники">
          <content>
             <VBox alignment="TOP_CENTER" spacing="10.0">
                <children>
@@ -46,7 +45,7 @@
             </VBox>
          </content>
     </Tab>
-      <Tab text="Товары">
+      <Tab fx:id="productTab" onSelectionChanged="#productTabSelected" text="Товары">
         <content>
             <VBox alignment="TOP_CENTER" spacing="10.0">
                <children>
@@ -71,7 +70,7 @@
             </VBox>
         </content>
       </Tab>
-      <Tab text="Поставщики">
+      <Tab fx:id="supplierTab" onSelectionChanged="#supplierTabSelected" text="Поставщики">
         <content>
             <VBox spacing="10.0">
                <children>
@@ -104,7 +103,7 @@
             </VBox>
         </content>
       </Tab>
-    <Tab text="Аккаунт">
+    <Tab fx:id="accountTab" onSelectionChanged="#accountTabSelected" text="Аккаунт">
          <content>
             <VBox alignment="CENTER" spacing="50.0">
                <children>
@@ -139,7 +138,7 @@
                </padding>
             </VBox>
          </content></Tab>
-      <Tab text="Торговые точки">
+      <Tab fx:id="salePointTab" onSelectionChanged="#salePointTabSelected" text="Торговые точки">
         <content>
             <VBox spacing="10.0">
                <children>
@@ -169,13 +168,13 @@
             </VBox>
         </content>
       </Tab>
-      <Tab text="Залы">
+      <Tab fx:id="hallTab" onSelectionChanged="#hallTabSelected" text="Залы">
         <content>
             <VBox alignment="TOP_CENTER" spacing="10.0">
                <children>
                   <HBox alignment="TOP_CENTER" spacing="30.0">
                      <children>
-                        <ComboBox fx:id="salePointBox" prefWidth="150.0" promptText="Торговая точка" />
+                        <ComboBox fx:id="hallSalePointBox" prefWidth="150.0" promptText="Торговая точка" />
                         <Button mnemonicParsing="false" onAction="#onHallDeleteButtonClick" text="Удалить" />
                         <Button mnemonicParsing="false" onAction="#onHallAddButtonClick" text="Добавить зал" />
                      </children>
@@ -196,9 +195,32 @@
             </VBox>
         </content>
       </Tab>
-      <Tab text="Секции">
+      <Tab fx:id="sectionTab" onSelectionChanged="#sectionTabSelected" text="Секции">
         <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            <VBox spacing="10.0">
+               <children>
+                  <HBox alignment="TOP_CENTER" spacing="30.0">
+                     <children>
+                        <ComboBox fx:id="sectionSalePointBox" prefWidth="150.0" promptText="Торговая точка" />
+                        <ComboBox fx:id="sectionHallBox" prefWidth="150.0" promptText="Зал" />
+                        <Button mnemonicParsing="false" onAction="#deleteSectionButton" text="Удалить" />
+                        <Button mnemonicParsing="false" onAction="#addSectionButton" text="Добавить секцию" />
+                     </children>
+                  </HBox>
+                  <TableView fx:id="sectionsTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                    <columns>
+                      <TableColumn fx:id="sectionNameColumn" prefWidth="75.0" text="Название секции" />
+                      <TableColumn fx:id="sectionHallColumn" prefWidth="75.0" text="Зал" />
+                    </columns>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                  </TableView>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </VBox>
         </content>
       </Tab>
   </tabs>

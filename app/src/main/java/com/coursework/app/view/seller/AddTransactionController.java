@@ -4,7 +4,8 @@ import com.coursework.app.TradeOrganizationApp;
 import com.coursework.app.entity.Product;
 import com.coursework.app.entity.Seller;
 import com.coursework.app.entity.TransactionProduct;
-import com.coursework.app.service.ProductService;
+import com.coursework.app.exception.AddTransactionException;
+import com.coursework.app.service.SalePointService;
 import com.coursework.app.service.TransactionService;
 import com.coursework.app.utils.StringConverterUtils;
 import com.coursework.app.utils.ViewUtils;
@@ -32,7 +33,7 @@ public class AddTransactionController {
     @FXML
     private TableView<TransactionProduct> productTable;
     private final ObservableList<TransactionProduct> transactionProducts = FXCollections.observableArrayList();
-    private final ProductService productService = new ProductService();
+    private final SalePointService salePointService = new SalePointService();
     private final int salePointId = ((Seller) TradeOrganizationApp.getUser()).getHall().getSalePoint().getSalePointId();
     private final TransactionService transactionService = new TransactionService();
 
@@ -43,7 +44,7 @@ public class AddTransactionController {
             productName.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productNameStringConverter));
             productQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
-            productBox.getItems().addAll(productService.getSalePointProducts(salePointId).stream().filter(Product::getIsActive).toList());
+            productBox.getItems().addAll(salePointService.getSalePointProducts(salePointId).stream().filter(Product::getIsActive).toList());
             productBox.setConverter(StringConverterUtils.productNameStringConverter);
 
             productTable.setItems(transactionProducts);
@@ -71,13 +72,13 @@ public class AddTransactionController {
     protected void applyClick() {
         try {
             for (TransactionProduct products : transactionProducts) {
-                if (productService.getSalePointProductQuantity(salePointId, products.getProduct().getProductId()) < products.getQuantity()) {
+                if (salePointService.getSalePointProductQuantity(salePointId, products.getProduct().getProductId()) < products.getQuantity()) {
                     new Alert(Alert.AlertType.INFORMATION, "Такого количества товара нет на складе", ButtonType.OK).showAndWait();
                     return;
                 }
             }
-            transactionService.addTransaction(transactionProducts);
-        } catch (SQLException exception) {
+            transactionService.addTransaction(transactionProducts, TradeOrganizationApp.getUser().getUserLogin());
+        } catch (SQLException | AddTransactionException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }

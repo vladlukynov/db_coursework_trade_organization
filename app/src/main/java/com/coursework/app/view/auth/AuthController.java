@@ -37,7 +37,7 @@ public class AuthController {
 
         User user;
         try {
-            user = userService.getUser(login);
+            user = userService.getUserByLogin(login);
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
             return;
@@ -56,17 +56,22 @@ public class AuthController {
             return;
         }
 
-        TradeOrganizationApp.setUser(user);
         try {
             switch (user.getRole().getRoleName()) {
-                case "Администратор" ->
-                        openWindow("admin/admin-view.fxml", "Администратор", ViewUtils.getStage(loginField),
-                                true);
-                case "Продавец" -> openWindow("seller/seller-view.fxml", "Продавец", ViewUtils.getStage(loginField),
-                        true);
+                case "Администратор" -> {
+                    TradeOrganizationApp.setUser(user);
+                    openWindow("admin/admin-view.fxml", "Администратор", ViewUtils.getStage(loginField),
+                            true);
+                }
+                case "Продавец" -> {
+                    TradeOrganizationApp.setUser(userService.getSellerByLogin(login));
+                    openWindow("seller/seller-view.fxml", "Продавец", ViewUtils.getStage(loginField),
+                            true);
+                }
                 default -> System.out.println("Другие роли в разработке");
             }
-        } catch (IOException exception) {
+        } catch (IOException | SQLException | NoUserByLoginException exception) {
+            exception.printStackTrace(System.err);
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }

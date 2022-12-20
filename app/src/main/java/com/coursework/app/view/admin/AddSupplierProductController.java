@@ -64,8 +64,8 @@ public class AddSupplierProductController {
                 ViewUtils.getStage(priceField).close();
                 return;
             }
-            supplierService.addSupplierProduct(supplier.getSupplierId(), product.getProductId(), price, true);
-            ViewControllers.getAdminController().updateSuppliersPage();
+            supplierService.addSupplierProduct(supplier.getSupplierId(), product.getProductId(), price);
+            ViewControllers.getAdminController().updateSupplierProductsTable();
             ViewUtils.getStage(priceField).close();
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();

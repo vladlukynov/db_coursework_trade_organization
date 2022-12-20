@@ -67,7 +67,7 @@ public class StringConverterUtils {
     public static StringConverter<SalePoint> salePointNameStringConverter = new StringConverter<>() {
         @Override
         public String toString(SalePoint salePoint) {
-            return salePoint.getName();
+            return salePoint.getSalePointName();
         }
 
         @Override

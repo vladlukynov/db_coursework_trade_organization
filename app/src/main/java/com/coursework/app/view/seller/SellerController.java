@@ -2,7 +2,8 @@ package com.coursework.app.view.seller;
 
 import com.coursework.app.TradeOrganizationApp;
 import com.coursework.app.entity.Seller;
-import com.coursework.app.service.UserService;
+import com.coursework.app.exception.NoSalePointByIdException;
+import com.coursework.app.service.SalePointService;
 import com.coursework.app.utils.ViewUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -27,7 +28,7 @@ public class SellerController {
 
     @FXML
     private Label salePointLabel;
-    private final UserService userService = new UserService();
+    private final SalePointService salePointService = new SalePointService();
 
     @FXML
     protected void initialize() {
@@ -62,8 +63,8 @@ public class SellerController {
             hallLabel.setText("Зал: " + seller.getHall().getHallName());
             nameLabel.setText("ФИО: " + seller.getLastName() + " " + seller.getFirstName() + " " + seller.getMiddleName());
             roleLabel.setText("Роль в системе: " + seller.getRole().getRoleName());
-            salePointLabel.setText("Торговая точка: " + userService.getSellerSalePoint(seller.getUserLogin()).getName());
-        } catch (SQLException exception) {
+            salePointLabel.setText("Торговая точка: " + salePointService.getSalePointBySellerLogin(seller.getUserLogin()).getSalePointName());
+        } catch (SQLException | NoSalePointByIdException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }

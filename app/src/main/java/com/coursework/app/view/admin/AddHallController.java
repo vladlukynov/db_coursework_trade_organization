@@ -1,6 +1,7 @@
 package com.coursework.app.view.admin;
 
 import com.coursework.app.entity.Hall;
+import com.coursework.app.exception.AddHallException;
 import com.coursework.app.service.HallService;
 import com.coursework.app.utils.ViewUtils;
 import com.coursework.app.view.ViewControllers;
@@ -36,7 +37,7 @@ public class AddHallController {
             hallService.addHall(new Hall(name, ViewControllers.getAdminController().getSelectedSalePoint(), true));
             ViewControllers.getAdminController().updateHallsPage();
             ViewUtils.getStage(nameField).close();
-        } catch (SQLException exception) {
+        } catch (SQLException | AddHallException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }

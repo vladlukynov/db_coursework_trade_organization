@@ -14,7 +14,6 @@ import java.util.List;
 
 public class TransactionRepository {
     private final UserRepository userRepository = new UserRepository();
-    private final TransactionRepository transactionRepository = new TransactionRepository();
     private final ProductRepository productRepository = new ProductRepository();
 
     public List<Transaction> getSellerTransactions(String login) throws SQLException {
@@ -72,7 +71,7 @@ public class TransactionRepository {
             ResultSet resultSet = statement.executeQuery();
             List<TransactionProduct> list = new ArrayList<>();
             while (resultSet.next()) {
-                list.add(new TransactionProduct(transactionRepository.getTransactionById(resultSet.getInt("TransactionId")),
+                list.add(new TransactionProduct(getTransactionById(resultSet.getInt("TransactionId")),
                         productRepository.getProductById(resultSet.getInt("ProductId")),
                         resultSet.getInt("Quantity")));
             }

@@ -1,6 +1,7 @@
 package com.coursework.app.view.admin;
 
 import com.coursework.app.entity.Product;
+import com.coursework.app.exception.AddProductException;
 import com.coursework.app.service.ProductService;
 import com.coursework.app.utils.ViewUtils;
 import com.coursework.app.view.ViewControllers;
@@ -25,9 +26,9 @@ public class AddProductController {
         }
         try {
             productService.addProduct(new Product(name, true));
-            ViewControllers.getAdminController().updateProductsPage();
+            ViewControllers.getAdminController().updateProductTable();
             ViewUtils.getStage(nameField).close();
-        } catch (SQLException exception) {
+        } catch (SQLException | AddProductException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK);
         }
     }

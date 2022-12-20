@@ -17,7 +17,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class AdminController {
+    private boolean isInitialized = false;
+
     // Окно сотрудники
+    @FXML
+    private Tab employeeTab;
     @FXML
     private TableView<User> employeeTable;
     @FXML
@@ -32,13 +36,21 @@ public class AdminController {
     private TableColumn<User, Role> roleColumn;
     @FXML
     private TableColumn<User, Boolean> isActiveColumn;
+    private final ObservableList<User> users = FXCollections.observableArrayList();
+    private final ObservableList<String> employeeStatusBoxItems = FXCollections.observableArrayList("Не уволенные", "Уволенные");
+
     // Окно товары
+    @FXML
+    private Tab productTab;
     @FXML
     private TableView<Product> productsTable;
     @FXML
     private TableColumn<Product, String> productNameColumn;
+    private final ObservableList<Product> products = FXCollections.observableArrayList();
 
     // Окно поставщики
+    @FXML
+    private Tab supplierTab;
     @FXML
     private ComboBox<Supplier> supplierBox;
     @FXML
@@ -47,8 +59,24 @@ public class AdminController {
     private TableColumn<SupplierProduct, Product> supplierProductNameColumn;
     @FXML
     private TableColumn<SupplierProduct, Double> supplierProductPriceColumn;
+    private final ObservableList<SupplierProduct> supplierProducts = FXCollections.observableArrayList();
+    private final ObservableList<Supplier> supplierBoxItems = FXCollections.observableArrayList();
+
+    // Окно аккаунт
+    @FXML
+    private Tab accountTab;
+    @FXML
+    private ComboBox<String> employeeStatusBox;
+    @FXML
+    private Label loginLabel;
+    @FXML
+    private Label nameLabel;
+    @FXML
+    private Label roleLabel;
 
     // Окно торговые точки
+    @FXML
+    private Tab salePointTab;
     @FXML
     private TableView<SalePoint> salePointsTable;
     @FXML
@@ -63,8 +91,11 @@ public class AdminController {
     private TableColumn<SalePoint, Double> comServColumn;
     @FXML
     private TableColumn<SalePoint, Integer> countersColumn;
+    private final ObservableList<SalePoint> salePoints = FXCollections.observableArrayList();
 
     // Окно залы
+    @FXML
+    private Tab hallTab;
     @FXML
     private TableView<Hall> hallsTable;
     @FXML
@@ -72,34 +103,39 @@ public class AdminController {
     @FXML
     private TableColumn<Hall, SalePoint> hallSalePointNameColumn;
     @FXML
-    private ComboBox<SalePoint> salePointBox;
-
-    // Окно аккаунт
-    @FXML
-    private ComboBox<String> employeeStatusBox;
-    @FXML
-    private Label loginLabel;
-    @FXML
-    private Label nameLabel;
-    @FXML
-    private Label roleLabel;
-
-    private final ObservableList<User> users = FXCollections.observableArrayList();
-    private final ObservableList<Product> products = FXCollections.observableArrayList();
-    private final ObservableList<SupplierProduct> supplierProducts = FXCollections.observableArrayList();
-    private final ObservableList<SalePoint> salePoints = FXCollections.observableArrayList();
+    private ComboBox<SalePoint> hallSalePointBox;
     private final ObservableList<Hall> halls = FXCollections.observableArrayList();
-    private final ObservableList<Supplier> supplierBoxItems = FXCollections.observableArrayList();
-    private final ObservableList<SalePoint> salePointBoxItems = FXCollections.observableArrayList();
+    private final ObservableList<SalePoint> hallSalePointBoxItems = FXCollections.observableArrayList();
+
+    // Окно секции
+    @FXML
+    private Tab sectionTab;
+    @FXML
+    private TableView<Section> sectionsTable;
+    @FXML
+    private TableColumn<Section, String> sectionNameColumn;
+    @FXML
+    private TableColumn<Section, Hall> sectionHallColumn;
+    @FXML
+    private ComboBox<Hall> sectionHallBox;
+    @FXML
+    private ComboBox<SalePoint> sectionSalePointBox;
+    private final ObservableList<Section> sections = FXCollections.observableArrayList();
+    private final ObservableList<Hall> sectionHallBoxItems = FXCollections.observableArrayList();
+    private final ObservableList<SalePoint> sectionSalePointBoxItems = FXCollections.observableArrayList();
+
+    // Сервисы для обращения к БД
     private final UserService userService = new UserService();
     private final ProductService productService = new ProductService();
     private final SupplierService supplierService = new SupplierService();
     private final SalePointService salePointService = new SalePointService();
     private final HallService hallService = new HallService();
+    private final SectionService sectionService = new SectionService();
 
     @FXML
     protected void initialize() {
-        // Сотрудники
+        // Инициализируем все TableView
+        // Окно сотрудники
         loginColumn.setCellValueFactory(new PropertyValueFactory<>("userLogin"));
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
@@ -110,67 +146,73 @@ public class AdminController {
         isActiveColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.accountActiveStringConverter));
         employeeTable.setItems(users);
 
-        // Товары
+        // Окно товары
         productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
         productsTable.setItems(products);
 
-        // Поставщики
+        // Окно поставщики
         supplierProductNameColumn.setCellValueFactory(new PropertyValueFactory<>("product"));
         supplierProductNameColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productNameStringConverter));
         supplierProductPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         supplierProductsTable.setItems(supplierProducts);
 
-        // Торговые точки
-        salePointNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        // Окно торговые точки
+        salePointNameColumn.setCellValueFactory(new PropertyValueFactory<>("salePointName"));
         salePointTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         salePointTypeColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.salePointTypeStringConverter));
         salePointSizeColumn.setCellValueFactory(new PropertyValueFactory<>("pointSize"));
         salePointRentalColumn.setCellValueFactory(new PropertyValueFactory<>("rentalPrice"));
-        comServColumn.setCellValueFactory(new PropertyValueFactory<>("comServ"));
-        countersColumn.setCellValueFactory(new PropertyValueFactory<>("counters"));
+        comServColumn.setCellValueFactory(new PropertyValueFactory<>("communalService"));
+        countersColumn.setCellValueFactory(new PropertyValueFactory<>("countersNumber"));
         salePointsTable.setItems(salePoints);
 
-        // Залы
+        // Окно залы
         hallNameColumn.setCellValueFactory(new PropertyValueFactory<>("hallName"));
         hallSalePointNameColumn.setCellValueFactory(new PropertyValueFactory<>("salePoint"));
         hallSalePointNameColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.salePointNameStringConverter));
         hallsTable.setItems(halls);
 
+        // Окно секции
+        sectionNameColumn.setCellValueFactory(new PropertyValueFactory<>("sectionName"));
+        sectionHallColumn.setCellValueFactory(new PropertyValueFactory<>("hall"));
+        sectionHallColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.hallNameStringConverter));
+        sectionsTable.setItems(sections);
+
         // Инициализируем все Combobox
         // Сотрудники
-        employeeStatusBox.getItems().addAll("Не уволенные", "Уволенные");
-        employeeStatusBox.getSelectionModel().selectFirst();
-        employeeStatusBox.setOnAction(event -> updateEmployeesPage());
+        employeeStatusBox.setItems(employeeStatusBoxItems);
+        employeeStatusBox.setOnAction(event -> updateEmployeesTable());
 
         // Поставщики
         supplierBox.setItems(supplierBoxItems);
         supplierBox.setConverter(StringConverterUtils.supplierNameStringConverter);
-        supplierBox.setOnAction(event -> updateSuppliersPage());
+        supplierBox.setOnAction(event -> updateSupplierProductsTable());
 
-        // Торговые точки
-        salePointBox.setItems(salePointBoxItems);
-        salePointBox.setConverter(StringConverterUtils.salePointNameStringConverter);
-        salePointBox.setOnAction(event -> updateHallsPage());
+        // Залы
+        hallSalePointBox.setItems(hallSalePointBoxItems);
+        hallSalePointBox.setConverter(StringConverterUtils.salePointNameStringConverter);
+        hallSalePointBox.setOnAction(event -> updateHallsPage());
+
+        // Секции
+        sectionHallBox.setItems(sectionHallBoxItems);
+        sectionHallBox.setConverter(StringConverterUtils.hallNameStringConverter);
+        sectionSalePointBox.setItems(sectionSalePointBoxItems);
+        sectionSalePointBox.setConverter(StringConverterUtils.salePointNameStringConverter);
 
         ViewControllers.setAdminController(this);
-
-        initializeSupplierBox();
-        initializeSalePointsBox();
-
-        updateEmployeesPage();
-        updateProductsPage();
-        updateSuppliersPage();
-        updateAccountPage();
-        updateSalePointPage();
-        updateHallsPage();
+        isInitialized = true;
     }
 
     @FXML
     protected void onDismissEmployeeButtonClick() {
-        User user = employeeTable.getSelectionModel().getSelectedItem();
-        if (user != null) {
-            dismissUser(user.getUserLogin());
-            updateEmployeesPage();
+        try {
+            User user = employeeTable.getSelectionModel().getSelectedItem();
+            if (user != null) {
+                userService.deactivateUser(user.getUserLogin());
+                updateEmployeesTable();
+            }
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }
 
@@ -200,8 +242,8 @@ public class AdminController {
         try {
             Product product = productsTable.getSelectionModel().getSelectedItem();
             if (product != null) {
-                productService.changeProductStatus(product.getProductId(), false);
-                updateProductsPage();
+                productService.deactivateProduct(product.getProductId());
+                updateProductTable();
             }
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
@@ -224,8 +266,8 @@ public class AdminController {
         try {
             Supplier supplier = supplierBox.getSelectionModel().getSelectedItem();
             if (supplier != null) {
-                supplierService.changeSupplierStatus(supplier.getSupplierId(), false);
-                updateSuppliersPage();
+                supplierService.deactivateSupplier(supplier.getSupplierId());
+                updateSupplierProductsTable();
             }
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
@@ -248,9 +290,8 @@ public class AdminController {
             SupplierProduct product = supplierProductsTable.getSelectionModel().getSelectedItem();
             Supplier supplier = supplierBox.getSelectionModel().getSelectedItem();
             if (supplier != null && product != null) {
-                supplierService.changeSupplierProductStatus(supplier.getSupplierId(), product.getProduct().getProductId(),
-                        false);
-                updateSuppliersPage();
+                supplierService.deactivateSupplierProduct(supplier.getSupplierId(), product.getProduct().getProductId());
+                updateSupplierProductsTable();
             }
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
@@ -285,8 +326,8 @@ public class AdminController {
         try {
             SalePoint salePoint = salePointsTable.getSelectionModel().getSelectedItem();
             if (salePoint != null) {
-                salePointService.changeStatus(salePoint.getSalePointId(), false);
-                updateSalePointPage();
+                salePointService.deactivateById(salePoint.getSalePointId());
+                updateSalePointsTable();
             }
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
@@ -300,7 +341,7 @@ public class AdminController {
             Hall hall = hallsTable.getSelectionModel().getSelectedItem();
 
             if (hall != null) {
-                hallService.changeHallStatus(hall.getHallId(), false);
+                hallService.deactivateById(hall.getHallId());
                 updateHallsPage();
             }
         } catch (SQLException exception) {
@@ -318,17 +359,27 @@ public class AdminController {
         }
     }
 
-    // Отдельные методы
-    private void dismissUser(String login) {
-        try {
-            userService.setActiveStatus(login, 0);
-            updateEmployeesPage();
-        } catch (SQLException exception) {
-            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+    // Окно секции
+    @FXML
+    private void addSectionButton() {
+
+    }
+
+    private @FXML
+    void deleteSectionButton() {
+
+    }
+
+    /* ДЕЙСТВИЯ В ОКНЕ СОТРУДНИКИ */
+    @FXML
+    protected void employeeTabSelected() {
+        if (employeeTab.isSelected() && isInitialized) {
+            employeeStatusBox.getSelectionModel().selectFirst();
+            updateEmployeesTable();
         }
     }
 
-    public void updateEmployeesPage() {
+    public void updateEmployeesTable() {
         try {
             users.clear();
             if (employeeStatusBox.getSelectionModel().isSelected(0)) {
@@ -341,8 +392,17 @@ public class AdminController {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }
+    /* КОНЕЦ ДЕЙСТВИЙ В ОКНЕ СОТРУДНИКИ */
 
-    public void updateProductsPage() {
+    /* ДЕЙСТВИЯ В ОКНЕ ТОВАРЫ */
+    @FXML
+    private void productTabSelected() {
+        if (productTab.isSelected()) {
+            updateProductTable();
+        }
+    }
+
+    public void updateProductTable() {
         try {
             products.clear();
             productService.getProducts().forEach(product -> {
@@ -355,62 +415,18 @@ public class AdminController {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }
+    /* КОНЕЦ ДЕЙСТВИЙ В ОКНЕ ТОВАРЫ */
 
-    public void updateAccountPage() {
-        loginLabel.setText("Логин: " + TradeOrganizationApp.getUser().getUserLogin());
-        nameLabel.setText("ФИО: " + TradeOrganizationApp.getUser().getLastName() + " " +
-                TradeOrganizationApp.getUser().getFirstName() + " " +
-                TradeOrganizationApp.getUser().getMiddleName());
-        roleLabel.setText("Роль: " + TradeOrganizationApp.getUser().getRole().getRoleName());
-    }
-
-    public void updateSuppliersPage() {
-        try {
-            supplierProducts.clear();
-            Supplier supplier = supplierBox.getSelectionModel().getSelectedItem();
-            if (supplier != null) {
-                supplierService.getSupplierProducts(supplier.getSupplierId())
-                        .forEach(supplierProduct -> {
-                            if (supplierProduct.isActive() && supplierProduct.getProduct().getIsActive()) {
-                                supplierProducts.add(supplierProduct);
-                            }
-                        });
-            }
-        } catch (SQLException exception) {
-            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+    /* ДЕЙСТВИЯ В ОКНЕ ПОСТАВЩИКИ */
+    @FXML
+    protected void supplierTabSelected() {
+        if (supplierTab.isSelected()) {
+            updateSupplierBox();
+            updateSupplierProductsTable();
         }
     }
 
-    public void updateSalePointPage() {
-        try {
-            salePoints.clear();
-            salePointService.getSalePoints().forEach(point -> {
-                if (point.getIsActive()) {
-                    salePoints.add(point);
-                }
-            });
-        } catch (SQLException exception) {
-            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
-        }
-    }
-
-    public void updateHallsPage() {
-        try {
-            halls.clear();
-            SalePoint point = salePointBox.getSelectionModel().getSelectedItem();
-            if (point != null) {
-                hallService.getHalls().forEach(hall -> {
-                    if (hall.isActive() && hall.getSalePoint().getSalePointId() == point.getSalePointId()) {
-                        halls.add(hall);
-                    }
-                });
-            }
-        } catch (SQLException exception) {
-            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
-        }
-    }
-
-    public void initializeSupplierBox() {
+    public void updateSupplierBox() {
         try {
             supplierBoxItems.clear();
 
@@ -424,13 +440,79 @@ public class AdminController {
         }
     }
 
-    public void initializeSalePointsBox() {
+    public void updateSupplierProductsTable() {
         try {
-            salePointBoxItems.clear();
+            supplierProducts.clear();
+            Supplier supplier = supplierBox.getSelectionModel().getSelectedItem();
+            if (supplier != null) {
+                supplierService.getSupplierProducts(supplier.getSupplierId())
+                        .forEach(supplierProduct -> {
+                            if (supplierProduct.getIsActive() && supplierProduct.getProduct().getIsActive()) {
+                                supplierProducts.add(supplierProduct);
+                            }
+                        });
+            }
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+    /* КОНЕЦ ДЕЙСТВИЙ В ОКНЕ ПОСТАВЩИКИ */
+
+    /* ДЕЙСТВИЯ В ОКНЕ АККАУНТ */
+    @FXML
+    private void accountTabSelected() {
+        if (accountTab.isSelected()) {
+            updateAccountPage();
+        }
+    }
+
+    public void updateAccountPage() {
+        loginLabel.setText("Логин: " + TradeOrganizationApp.getUser().getUserLogin());
+        nameLabel.setText("ФИО: " + TradeOrganizationApp.getUser().getLastName() + " " +
+                TradeOrganizationApp.getUser().getFirstName() + " " +
+                TradeOrganizationApp.getUser().getMiddleName());
+        roleLabel.setText("Роль: " + TradeOrganizationApp.getUser().getRole().getRoleName());
+    }
+    /* КОНЕЦ ДЕЙСТВИЙ В ОКНЕ АККАУНТ */
+
+    /* ДЕЙСТВИЯ В ОКНЕ ТОРГОВЫЕ ТОЧКИ */
+    @FXML
+    private void salePointTabSelected() {
+        if (salePointTab.isSelected()) {
+            updateSalePointsTable();
+        }
+    }
+
+    public void updateSalePointsTable() {
+        try {
+            salePoints.clear();
+            salePointService.getSalePoints().forEach(point -> {
+                if (point.getIsActive()) {
+                    salePoints.add(point);
+                }
+            });
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+    /* КОНЕЦ ДЕЙСТВИЙ В ОКНЕ ТОРГОВЫЕ ТОЧКИ */
+
+    /* ДЕЙСТВИЯ В ОКНЕ ЗАЛЫ */
+    @FXML
+    private void hallTabSelected() {
+        if (hallTab.isSelected()) {
+            updateHallSalePointBox();
+            updateHallsPage();
+        }
+    }
+
+    public void updateHallSalePointBox() {
+        try {
+            hallSalePointBoxItems.clear();
 
             salePointService.getSalePoints().forEach(point -> {
                 if (point.getIsActive()) {
-                    salePointBoxItems.add(point);
+                    hallSalePointBoxItems.add(point);
                 }
             });
         } catch (SQLException exception) {
@@ -438,11 +520,36 @@ public class AdminController {
         }
     }
 
-    public Supplier getSelectedSupplier() {
+    public void updateHallsPage() {
+        try {
+            halls.clear();
+            SalePoint point = hallSalePointBox.getSelectionModel().getSelectedItem();
+            if (point != null) {
+                hallService.getHalls().forEach(hall -> {
+                    if (hall.getIsActive() && hall.getSalePoint().getSalePointId() == point.getSalePointId()) {
+                        halls.add(hall);
+                    }
+                });
+            }
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+    /* КОНЕЦ ДЕЙСТВИЙ В ОКНЕ ЗАЛЫ */
+
+    @FXML
+    protected void sectionTabSelected() {
+        if (sectionTab.isSelected()) {
+            System.out.println("Секции");
+        }
+    }
+
+    // Геттеры
+    protected Supplier getSelectedSupplier() {
         return supplierBox.getSelectionModel().getSelectedItem();
     }
 
-    public SalePoint getSelectedSalePoint() {
-        return salePointBox.getSelectionModel().getSelectedItem();
+    protected SalePoint getSelectedSalePoint() {
+        return hallSalePointBox.getSelectionModel().getSelectedItem();
     }
 }

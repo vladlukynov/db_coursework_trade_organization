@@ -10,7 +10,6 @@ import java.util.List;
 
 public class SupplierRepository {
     private final ProductRepository productRepository = new ProductRepository();
-    private final SupplierRepository supplierRepository = new SupplierRepository();
 
     public List<Supplier> getSuppliers() throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
@@ -104,7 +103,7 @@ public class SupplierRepository {
             statement.setBoolean(4, true);
             statement.execute();
 
-            return new SupplierProduct(supplierRepository.getSupplierById(supplierId),
+            return new SupplierProduct(getSupplierById(supplierId),
                     productRepository.getProductById(productId), price, true);
         }
     }

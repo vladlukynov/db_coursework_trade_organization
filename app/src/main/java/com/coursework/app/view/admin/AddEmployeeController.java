@@ -94,7 +94,7 @@ public class AddEmployeeController {
                 userService.addUser(new User(login, password, name[1], name[0], name[2], role, true));
             }
 
-            ViewControllers.getAdminController().updateEmployeesPage();
+            ViewControllers.getAdminController().updateEmployeesTable();
             ViewUtils.getStage(loginField).close();
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
@@ -136,11 +136,11 @@ public class AddEmployeeController {
             if (role.getRoleName().equals("Руководитель")) {
                 sectionBox.getItems().clear();
                 sectionBox.getItems().addAll(sectionService.getSectionsBySalePointId(salePoint.getSalePointId())
-                        .stream().filter(Section::isActive).toList());
+                        .stream().filter(Section::getIsActive).toList());
             } else if (role.getRoleName().equals("Продавец")) {
                 hallBox.getItems().clear();
                 hallBox.getItems().addAll(hallService.getHallsBySalePointId(salePoint.getSalePointId())
-                        .stream().filter(Hall::isActive).toList());
+                        .stream().filter(Hall::getIsActive).toList());
             }
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
