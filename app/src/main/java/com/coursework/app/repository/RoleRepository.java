@@ -1,31 +1,37 @@
 package com.coursework.app.repository;
 
 import com.coursework.app.entity.Role;
-import com.coursework.app.utils.DBConstants;
+import com.coursework.app.utils.DBProperties;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class RoleRepository {
     public List<Role> getRoles() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBConstants.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Roles");
             ResultSet resultSet = statement.executeQuery();
-            List<Role> roles = new ArrayList<>();
-
+            List<Role> list = new ArrayList<>();
             while (resultSet.next()) {
-                roles.add(new Role(resultSet.getInt("RoleId"),
+                list.add(new Role(resultSet.getInt("RoleId"),
                         resultSet.getString("RoleName")));
             }
-            return roles;
+            return list;
         }
     }
 
-    public Role getRole(int roleId) throws SQLException {
-        List<Role> roles = getRoles();
-        Optional<Role> optionalRole = roles.stream().filter(role -> role.getRoleId() == roleId).findFirst();
-        return optionalRole.orElse(null);
+    public Role getRoleById(int id) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT * FROM Roles WHERE RoleId = ?""");
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new Role(resultSet.getInt("RoleId"),
+                        resultSet.getString("RoleName"));
+            }
+            return null;
+        }
     }
 }

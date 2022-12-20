@@ -2,9 +2,11 @@ package com.coursework.app.service;
 
 import com.coursework.app.entity.Supplier;
 import com.coursework.app.entity.SupplierProduct;
+import com.coursework.app.exception.AddSupplierException;
+import com.coursework.app.exception.NoSupplierByIdException;
 import com.coursework.app.repository.SupplierRepository;
 
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 public class SupplierService {
@@ -14,23 +16,35 @@ public class SupplierService {
         return supplierRepository.getSuppliers();
     }
 
-    public List<SupplierProduct> getSupplierProducts(int supplierId) throws SQLException {
-        return supplierRepository.getSupplierProducts(supplierId);
+    public Supplier getSupplierById(int id) throws SQLException, NoSupplierByIdException {
+        Supplier supplier = supplierRepository.getSupplierById(id);
+        if (supplier == null) {
+            throw new NoSupplierByIdException("Поставщиков с ID " + id + " не найдено");
+        }
+        return supplier;
     }
 
-    public void addSupplier(Supplier supplier) throws SQLException {
-        supplierRepository.addSupplier(supplier);
+    public Supplier addSupplier(Supplier supplier) throws SQLException, AddSupplierException {
+        Supplier supplier_ = supplierRepository.addSupplier(supplier);
+        if (supplier_ == null) {
+            throw new AddSupplierException("Ошибка при добавлении поставщика в БД");
+        }
+        return supplier_;
     }
 
-    public void changeSupplierStatus(int supplierId, boolean status) throws SQLException {
-        supplierRepository.changeSupplierStatus(supplierId, status);
+    public void deactivateSupplier(int id) throws SQLException {
+        supplierRepository.changeActiveStatus(id, false);
     }
 
-    public void addSupplierProduct(int supplierId, int productId, double price, boolean isActive) throws SQLException {
-        supplierRepository.addSupplierProduct(supplierId, productId, price, isActive);
+    public List<SupplierProduct> getSupplierProducts(int id) throws SQLException {
+        return supplierRepository.getSupplierProducts(id);
     }
 
-    public void changeSupplierProductStatus(int supplierId, int productId, boolean status) throws SQLException {
-        supplierRepository.changeSupplierProductStatus(supplierId, productId, status);
+    public void deactivateSupplierProduct(int supplierId, int productId) throws SQLException {
+        supplierRepository.changeProductActiveStatus(supplierId, productId, false);
+    }
+
+    public SupplierProduct addSupplierProduct(int supplierId, int productId, double price) throws SQLException {
+        return supplierRepository.addSupplierProduct(supplierId, productId, price);
     }
 }

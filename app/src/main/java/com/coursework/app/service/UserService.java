@@ -1,13 +1,12 @@
 package com.coursework.app.service;
 
-import com.coursework.app.entity.SalePoint;
 import com.coursework.app.entity.Seller;
 import com.coursework.app.entity.SuperVisor;
 import com.coursework.app.entity.User;
 import com.coursework.app.exception.NoUserByLoginException;
 import com.coursework.app.repository.UserRepository;
 
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 public class UserService {
@@ -17,37 +16,43 @@ public class UserService {
         return userRepository.getUsers();
     }
 
-    public User getUser(String userLogin) throws SQLException, NoUserByLoginException {
-        User user = userRepository.getUser(userLogin);
-
-        if (user != null) {
-            return user;
+    public User getUserByLogin(String login) throws SQLException, NoUserByLoginException {
+        User user = userRepository.getUserByLogin(login);
+        if (user == null) {
+            throw new NoUserByLoginException("Пользователя " + login + " не найдено");
         }
-
-        throw new NoUserByLoginException("Not find user by login " + userLogin);
+        return user;
     }
 
-    public void setActiveStatus(String userLogin, int status) throws SQLException {
-        userRepository.setActiveStatus(userLogin, status);
+    public Seller getSellerByLogin(String login) throws SQLException, NoUserByLoginException {
+        Seller seller = userRepository.getSellerByLogin(login);
+        if (seller == null) {
+            throw new NoUserByLoginException("Продавца " + login + " не найдено");
+        }
+        return seller;
     }
 
-    public void addUser(User user) throws SQLException {
-        userRepository.addUser(user);
+    public SuperVisor getSuperVisorByLogin(String login) throws SQLException, NoUserByLoginException {
+        SuperVisor superVisor = userRepository.getSuperVisorByLogin(login);
+        if (superVisor == null) {
+            throw new NoUserByLoginException("Руководителя " + login + " не найдено");
+        }
+        return superVisor;
     }
 
-    public void addSuperVisor(SuperVisor superVisor) throws SQLException {
-        userRepository.addSuperVisor(superVisor);
+    public User addUser(User user) throws SQLException {
+        return userRepository.addUser(user);
     }
 
-    public void addSeller(Seller seller) throws SQLException {
-        userRepository.addSeller(seller);
+    public Seller addSeller(Seller seller) throws SQLException {
+        return userRepository.addSeller(seller);
     }
 
-    public SalePoint getSellerSalePoint(String sellerLogin) throws SQLException {
-        return userRepository.getSellerSalePoint(sellerLogin);
+    public SuperVisor addSuperVisor(SuperVisor superVisor) throws SQLException {
+        return userRepository.addSuperVisor(superVisor);
     }
 
-    public Seller getSeller(String sellerLogin) throws SQLException {
-        return userRepository.getSeller(sellerLogin);
+    public void deactivateUser(String login) throws SQLException {
+        userRepository.changeActiveStatus(login, false);
     }
 }

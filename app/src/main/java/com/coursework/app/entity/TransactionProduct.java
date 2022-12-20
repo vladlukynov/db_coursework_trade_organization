@@ -9,7 +9,6 @@ public class TransactionProduct {
         this.product = product;
         this.quantity = quantity;
     }
-
     public TransactionProduct(Transaction transaction, Product product, int quantity) {
         this.transaction = transaction;
         this.product = product;
@@ -26,5 +25,9 @@ public class TransactionProduct {
 
     public int getQuantity() {
         return quantity;
+    }
+
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 }

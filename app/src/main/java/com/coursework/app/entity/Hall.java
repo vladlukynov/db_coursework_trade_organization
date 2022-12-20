@@ -23,6 +23,10 @@ public class Hall {
         return hallId;
     }
 
+    public void setHallId(int hallId) {
+        this.hallId = hallId;
+    }
+
     public String getHallName() {
         return hallName;
     }
@@ -31,7 +35,7 @@ public class Hall {
         return salePoint;
     }
 
-    public boolean isActive() {
+    public boolean getIsActive() {
         return isActive;
     }
 }

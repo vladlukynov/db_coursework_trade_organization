@@ -1,6 +1,8 @@
 package com.coursework.app.service;
 
 import com.coursework.app.entity.Product;
+import com.coursework.app.exception.AddProductException;
+import com.coursework.app.exception.NoProductByIdException;
 import com.coursework.app.repository.ProductRepository;
 
 import java.sql.SQLException;
@@ -13,23 +15,23 @@ public class ProductService {
         return productRepository.getProducts();
     }
 
-    public void addProduct(Product product) throws SQLException {
-        productRepository.addProduct(product);
+    public Product getProductById(int id) throws SQLException, NoProductByIdException {
+        Product product = productRepository.getProductById(id);
+        if (product == null) {
+            throw new NoProductByIdException("Товара с ID " + id + " не найдено");
+        }
+        return product;
     }
 
-    public void changeProductStatus(int productId, boolean status) throws SQLException {
-        productRepository.changeActiveStatus(productId, status);
+    public Product addProduct(Product product) throws SQLException, AddProductException {
+        Product product_ = productRepository.addProduct(product);
+        if (product_ == null) {
+            throw new AddProductException("Ошибка при добавлении товара в БД");
+        }
+        return product_;
     }
 
-    public List<Product> getSalePointProducts(int salePointId) throws SQLException {
-        return productRepository.getSalePointProducts(salePointId);
-    }
-
-    public int getSalePointProductQuantity(int salePointId, int productId) throws SQLException {
-        return productRepository.getSalePointProductQuantity(salePointId, productId);
-    }
-
-    public void changeProduct(int productId, int minusQuantity) throws SQLException {
-        productRepository.changeProduct(productId, minusQuantity);
+    public void deactivateProduct(int id) throws SQLException {
+        productRepository.changeActiveStatus(id, false);
     }
 }

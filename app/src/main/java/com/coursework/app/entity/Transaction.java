@@ -1,18 +1,18 @@
 package com.coursework.app.entity;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public class Transaction {
     private int transactionId;
     private final Seller seller;
-    private final LocalDate transactionDate;
+    private final Date transactionDate;
 
-    public Transaction(Seller seller, LocalDate transactionDate) {
+    public Transaction(Seller seller, Date transactionDate) {
         this.seller = seller;
         this.transactionDate = transactionDate;
     }
 
-    public Transaction(int transactionId, Seller seller, LocalDate transactionDate) {
+    public Transaction(int transactionId, Seller seller, Date transactionDate) {
         this.transactionId = transactionId;
         this.seller = seller;
         this.transactionDate = transactionDate;
@@ -22,15 +22,15 @@ public class Transaction {
         return transactionId;
     }
 
+    public void setTransactionId(int transactionId) {
+        this.transactionId = transactionId;
+    }
+
     public Seller getSeller() {
         return seller;
     }
 
-    public LocalDate getTransactionDate() {
+    public Date getTransactionDate() {
         return transactionDate;
-    }
-
-    public void setTransactionId(int transactionId) {
-        this.transactionId = transactionId;
     }
 }
