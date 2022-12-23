@@ -17,19 +17,17 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class AddTransactionController {
     @FXML
     private ComboBox<Product> productBox;
-
     @FXML
-    private TableColumn<TransactionProduct, Product> productName;
-
+    private TableColumn<TransactionProduct, Product> productNameColumn;
     @FXML
-    private TableColumn<TransactionProduct, Integer> productQuantity;
+    private TableColumn<TransactionProduct, Integer> productQuantityColumn;
     @FXML
     private TextField quantityField;
-
     @FXML
     private TableView<TransactionProduct> productTable;
     private final ObservableList<TransactionProduct> transactionProducts = FXCollections.observableArrayList();
@@ -40,9 +38,9 @@ public class AddTransactionController {
     @FXML
     protected void initialize() {
         try {
-            productName.setCellValueFactory(new PropertyValueFactory<>("product"));
-            productName.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productNameStringConverter));
-            productQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+            productNameColumn.setCellValueFactory(new PropertyValueFactory<>("product"));
+            productNameColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productNameStringConverter));
+            productQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
             productBox.getItems().addAll(salePointService.getSalePointProducts(salePointId).stream().filter(Product::getIsActive).toList());
             productBox.setConverter(StringConverterUtils.productNameStringConverter);
@@ -64,7 +62,15 @@ public class AddTransactionController {
             return;
         }
         if (product != null) {
-            transactionProducts.add(new TransactionProduct(product, quantity));
+            Optional<TransactionProduct> optionalProduct = transactionProducts.stream().filter(product_ ->
+                    product_.getProduct().getProductId() == product.getProductId()).findFirst();
+            if (optionalProduct.isPresent()) {
+                TransactionProduct product_ = optionalProduct.get();
+                product_.setQuantity(product_.getQuantity() + quantity);
+            } else {
+                transactionProducts.add(new TransactionProduct(product, quantity));
+            }
+            productTable.refresh();
         }
     }
 
@@ -74,6 +80,7 @@ public class AddTransactionController {
             for (TransactionProduct products : transactionProducts) {
                 if (salePointService.getSalePointProductQuantity(salePointId, products.getProduct().getProductId()) < products.getQuantity()) {
                     new Alert(Alert.AlertType.INFORMATION, "Такого количества товара нет на складе", ButtonType.OK).showAndWait();
+                    ViewUtils.getStage(quantityField).close();
                     return;
                 }
             }

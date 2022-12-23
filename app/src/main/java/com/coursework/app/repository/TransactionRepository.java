@@ -6,10 +6,8 @@ import com.coursework.app.utils.DBProperties;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class TransactionRepository {
@@ -26,7 +24,7 @@ public class TransactionRepository {
             while (resultSet.next()) {
                 list.add(new Transaction(resultSet.getInt("TransactionId"),
                         userRepository.getSellerByLogin(resultSet.getString("SellerLogin")),
-                        resultSet.getDate("TransactionDate")));
+                        LocalDate.parse(resultSet.getString("TransactionDate"))));
             }
             return list;
         }
@@ -41,7 +39,7 @@ public class TransactionRepository {
             if (resultSet.next()) {
                 return new Transaction(resultSet.getInt("TransactionId"),
                         userRepository.getSellerByLogin(resultSet.getString("SellerLogin")),
-                        resultSet.getDate("TransactionDate"));
+                        LocalDate.parse(resultSet.getString("TransactionDate")));
             }
             return null;
         }
@@ -58,7 +56,7 @@ public class TransactionRepository {
             if (resultSet.next()) {
                 return new Transaction(resultSet.getInt(1),
                         userRepository.getSellerByLogin(sellerLogin),
-                        Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+                        LocalDate.now());
             }
             return null;
         }

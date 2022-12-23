@@ -2,18 +2,38 @@ package com.coursework.app.view.seller;
 
 import com.coursework.app.TradeOrganizationApp;
 import com.coursework.app.entity.Seller;
+import com.coursework.app.entity.Transaction;
 import com.coursework.app.exception.NoSalePointByIdException;
 import com.coursework.app.service.SalePointService;
+import com.coursework.app.service.TransactionService;
+import com.coursework.app.utils.StringConverterUtils;
 import com.coursework.app.utils.ViewUtils;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 public class SellerController {
+    // Окно продажи
+    @FXML
+    private Tab salesTab;
+    @FXML
+    private TableView<Transaction> transactionsTable;
+    @FXML
+    private TableColumn<Transaction, Integer> transactionIdColumn;
+    @FXML
+    private TableColumn<Transaction, LocalDate> transactionDateColumn;
+    private final ObservableList<Transaction> transactions = FXCollections.observableArrayList();
+
+    // Окно аккаунт
+    @FXML
+    private Tab accountTab;
     @FXML
     private Label loginLabel;
 
@@ -29,10 +49,14 @@ public class SellerController {
     @FXML
     private Label salePointLabel;
     private final SalePointService salePointService = new SalePointService();
+    private final TransactionService transactionService = new TransactionService();
 
     @FXML
     protected void initialize() {
-        updateAccountPage();
+        transactionIdColumn.setCellValueFactory(new PropertyValueFactory<>("transactionId"));
+        transactionDateColumn.setCellValueFactory(new PropertyValueFactory<>("transactionDate"));
+        transactionDateColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.transactionDateConverter));
+        transactionsTable.setItems(transactions);
     }
 
     @FXML
@@ -53,6 +77,31 @@ public class SellerController {
                     ViewUtils.getStage(loginLabel), true);
         } catch (IOException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    // Окно продажи
+    @FXML
+    private void salesTabSelected() {
+        if (salesTab.isSelected()) {
+            transactionsTableUpdate();
+        }
+    }
+
+    protected void transactionsTableUpdate() {
+        try {
+            transactions.clear();
+            transactions.addAll(transactionService.getSellerTransaction(TradeOrganizationApp.getUser().getUserLogin()));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    // Окно аккаунт
+    @FXML
+    private void accountTabSelected() {
+        if (accountTab.isSelected()) {
+            updateAccountPage();
         }
     }
 
