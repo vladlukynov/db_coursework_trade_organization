@@ -115,8 +115,6 @@ public class AdminController {
     @FXML
     private TableColumn<Section, String> sectionNameColumn;
     @FXML
-    private TableColumn<Section, Hall> sectionHallColumn;
-    @FXML
     private ComboBox<Hall> sectionHallBox;
     @FXML
     private ComboBox<SalePoint> sectionSalePointBox;
@@ -174,8 +172,6 @@ public class AdminController {
 
         // Окно секции
         sectionNameColumn.setCellValueFactory(new PropertyValueFactory<>("sectionName"));
-        sectionHallColumn.setCellValueFactory(new PropertyValueFactory<>("hall"));
-        sectionHallColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.hallNameStringConverter));
         sectionsTable.setItems(sections);
 
         // Инициализируем все Combobox
@@ -196,8 +192,10 @@ public class AdminController {
         // Секции
         sectionHallBox.setItems(sectionHallBoxItems);
         sectionHallBox.setConverter(StringConverterUtils.hallNameStringConverter);
+        sectionHallBox.setOnAction(event -> updateSectionTable());
         sectionSalePointBox.setItems(sectionSalePointBoxItems);
         sectionSalePointBox.setConverter(StringConverterUtils.salePointNameStringConverter);
+        sectionSalePointBox.setOnAction(event -> updateSectionHallBox());
 
         ViewControllers.setAdminController(this);
         isInitialized = true;
@@ -362,12 +360,25 @@ public class AdminController {
     // Окно секции
     @FXML
     private void addSectionButton() {
-
+        try {
+            ViewUtils.openWindow("admin/add-section-view.fxml", "Добавить секцию",
+                    ViewUtils.getStage(loginLabel), false);
+        } catch (IOException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
     }
 
-    private @FXML
-    void deleteSectionButton() {
-
+    @FXML
+    private void deleteSectionButton() {
+        Section section = sectionsTable.getSelectionModel().getSelectedItem();
+        if (section != null) {
+            try {
+                sectionService.deactivateSection(section.getSectionId());
+                updateSectionTable();
+            } catch (SQLException exception) {
+                new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            }
+        }
     }
 
     /* ДЕЙСТВИЯ В ОКНЕ СОТРУДНИКИ */
@@ -405,11 +416,7 @@ public class AdminController {
     public void updateProductTable() {
         try {
             products.clear();
-            productService.getProducts().forEach(product -> {
-                if (product.getIsActive()) {
-                    products.add(product);
-                }
-            });
+            products.addAll(productService.getProducts().stream().filter(Product::getIsActive).toList());
             products.sort((o1, o2) -> o1.getProductName().compareToIgnoreCase(o2.getProductName()));
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
@@ -429,12 +436,7 @@ public class AdminController {
     public void updateSupplierBox() {
         try {
             supplierBoxItems.clear();
-
-            supplierService.getSuppliers().forEach(supplier -> {
-                if (supplier.getIsActive()) {
-                    supplierBoxItems.add(supplier);
-                }
-            });
+            supplierBoxItems.addAll(supplierService.getSuppliers().stream().filter(Supplier::getIsActive).toList());
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
@@ -445,12 +447,8 @@ public class AdminController {
             supplierProducts.clear();
             Supplier supplier = supplierBox.getSelectionModel().getSelectedItem();
             if (supplier != null) {
-                supplierService.getSupplierProducts(supplier.getSupplierId())
-                        .forEach(supplierProduct -> {
-                            if (supplierProduct.getIsActive() && supplierProduct.getProduct().getIsActive()) {
-                                supplierProducts.add(supplierProduct);
-                            }
-                        });
+                supplierProducts.addAll(supplierService.getSupplierProducts(supplier.getSupplierId()).stream()
+                        .filter(supplierProduct -> supplierProduct.getIsActive() && supplierProduct.getProduct().getIsActive()).toList());
             }
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
@@ -486,11 +484,7 @@ public class AdminController {
     public void updateSalePointsTable() {
         try {
             salePoints.clear();
-            salePointService.getSalePoints().forEach(point -> {
-                if (point.getIsActive()) {
-                    salePoints.add(point);
-                }
-            });
+            salePoints.addAll(salePointService.getSalePoints().stream().filter(SalePoint::getIsActive).toList());
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
@@ -509,12 +503,7 @@ public class AdminController {
     public void updateHallSalePointBox() {
         try {
             hallSalePointBoxItems.clear();
-
-            salePointService.getSalePoints().forEach(point -> {
-                if (point.getIsActive()) {
-                    hallSalePointBoxItems.add(point);
-                }
-            });
+            hallSalePointBoxItems.addAll(salePointService.getSalePoints().stream().filter(SalePoint::getIsActive).toList());
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
@@ -525,11 +514,8 @@ public class AdminController {
             halls.clear();
             SalePoint point = hallSalePointBox.getSelectionModel().getSelectedItem();
             if (point != null) {
-                hallService.getHalls().forEach(hall -> {
-                    if (hall.getIsActive() && hall.getSalePoint().getSalePointId() == point.getSalePointId()) {
-                        halls.add(hall);
-                    }
-                });
+                halls.addAll(hallService.getHalls().stream().filter(hall -> hall.getIsActive() &&
+                        hall.getSalePoint().getSalePointId() == point.getSalePointId()).toList());
             }
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
@@ -537,19 +523,65 @@ public class AdminController {
     }
     /* КОНЕЦ ДЕЙСТВИЙ В ОКНЕ ЗАЛЫ */
 
+    /* ДЕЙСТВИЯ В ОКНЕ СЕКЦИИ */
     @FXML
     protected void sectionTabSelected() {
         if (sectionTab.isSelected()) {
-            System.out.println("Секции");
+            updateSectionSalePointBox();
+        } else {
+            sectionHallBox.setDisable(true);
+            sectionHallBoxItems.clear();
         }
     }
+
+    protected void updateSectionSalePointBox() {
+        try {
+            sectionSalePointBoxItems.clear();
+            sectionSalePointBoxItems.addAll(salePointService.getSalePoints().stream().filter(SalePoint::getIsActive).toList());
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    protected void updateSectionHallBox() {
+        SalePoint salePoint = sectionSalePointBox.getSelectionModel().getSelectedItem();
+        if (salePoint != null) {
+            sectionHallBoxItems.clear();
+            sectionHallBox.setDisable(false);
+            try {
+                sectionHallBoxItems.addAll(hallService.getHallsBySalePointId(salePoint.getSalePointId()).stream()
+                        .filter(Hall::getIsActive).toList());
+            } catch (SQLException exception) {
+                new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            }
+        }
+    }
+
+    protected void updateSectionTable() {
+        SalePoint salePoint = sectionSalePointBox.getSelectionModel().getSelectedItem();
+        Hall hall = sectionHallBox.getSelectionModel().getSelectedItem();
+        if (salePoint != null && hall != null) {
+            sections.clear();
+            try {
+                sections.addAll(sectionService.getSectionsByHallId(hall.getHallId())
+                        .stream().filter(Section::getIsActive).toList());
+            } catch (SQLException exception) {
+                new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            }
+        }
+    }
+    /* КОНЕЦ ДЕЙСТВИЙ В ОКНЕ СЕКЦИИ */
 
     // Геттеры
     protected Supplier getSelectedSupplier() {
         return supplierBox.getSelectionModel().getSelectedItem();
     }
 
-    protected SalePoint getSelectedSalePoint() {
+    protected SalePoint getSelectedHallSalePoint() {
         return hallSalePointBox.getSelectionModel().getSelectedItem();
+    }
+
+    protected Hall getSelectedSectionHall() {
+        return sectionHallBox.getSelectionModel().getSelectedItem();
     }
 }

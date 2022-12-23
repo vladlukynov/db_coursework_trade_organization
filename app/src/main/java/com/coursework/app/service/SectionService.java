@@ -38,4 +38,8 @@ public class SectionService {
     public List<Section> getSectionsBySalePointId(int salePointId) throws SQLException {
         return sectionRepository.getSectionsBySalePointId(salePointId);
     }
+
+    public List<Section> getSectionsByHallId(int id) throws SQLException {
+        return sectionRepository.getSectionsByHallId(id);
+    }
 }

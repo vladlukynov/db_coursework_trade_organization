@@ -85,4 +85,21 @@ public class SectionRepository {
             return list;
         }
     }
+
+    public List<Section> getSectionsByHallId(int id) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT * FROM Sections WHERE HallId=?""");
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            List<Section> list = new ArrayList<>();
+            while (resultSet.next()) {
+                list.add(new Section(resultSet.getInt("SectionId"),
+                        resultSet.getString("SectionName"),
+                        hallRepository.getHallById(resultSet.getInt("HallId")),
+                        resultSet.getBoolean("IsActive")));
+            }
+            return list;
+        }
+    }
 }

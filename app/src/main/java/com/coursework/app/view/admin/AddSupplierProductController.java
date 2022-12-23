@@ -26,11 +26,7 @@ public class AddSupplierProductController {
     @FXML
     protected void initialize() {
         try {
-            productService.getProducts().forEach(product -> {
-                if (product.getIsActive()) {
-                    productBox.getItems().add(product);
-                }
-            });
+            productBox.getItems().addAll(productService.getProducts().stream().filter(Product::getIsActive).toList());
             productBox.setConverter(StringConverterUtils.productNameStringConverter);
         } catch (SQLException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
