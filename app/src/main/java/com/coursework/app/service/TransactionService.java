@@ -24,11 +24,15 @@ public class TransactionService {
         return transaction;
     }
 
-    public Transaction addTransaction(List<TransactionProduct> products, String sellerLogin) throws SQLException, AddTransactionException {
-        Transaction transaction_ = transactionRepository.addTransaction(products, sellerLogin);
+    public Transaction addTransaction(Transaction transaction) throws SQLException, AddTransactionException {
+        Transaction transaction_ = transactionRepository.addTransaction(transaction);
         if (transaction_ == null) {
             throw new AddTransactionException("Ошибка добавления транзакции в БД");
         }
         return transaction_;
+    }
+
+    public TransactionProduct addTransactionProduct(TransactionProduct product) throws SQLException {
+        return transactionRepository.addTransactionProduct(product);
     }
 }

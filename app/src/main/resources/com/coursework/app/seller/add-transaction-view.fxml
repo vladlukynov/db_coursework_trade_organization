@@ -11,8 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<VBox alignment="CENTER" prefHeight="430.0" prefWidth="626.0" spacing="10.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coursework.app.view.seller.AddTransactionController">
+<VBox fx:id="primaryLayout" alignment="CENTER" prefHeight="430.0" prefWidth="626.0" spacing="10.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coursework.app.view.seller.AddTransactionController">
    <children>
       <Label text="Добавление товаров">
          <font>

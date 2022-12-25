@@ -45,20 +45,32 @@ public class TransactionRepository {
         }
     }
 
-    public Transaction addTransaction(List<TransactionProduct> products, String sellerLogin) throws SQLException {
+    public Transaction addTransaction(Transaction transaction) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO Transactions(SellerLogin, TransactionDate) VALUES (?,?)""", Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, sellerLogin);
-            statement.setString(2, LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+            statement.setString(1, transaction.getSeller().getUserLogin());
+            statement.setString(2, transaction.getTransactionDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             if (resultSet.next()) {
-                return new Transaction(resultSet.getInt(1),
-                        userRepository.getSellerByLogin(sellerLogin),
-                        LocalDate.now());
+                transaction.setTransactionId(resultSet.getInt(1));
+                return transaction;
             }
             return null;
+        }
+    }
+
+    public TransactionProduct addTransactionProduct(TransactionProduct product) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO TransactionsProducts(TransactionId, ProductId, Quantity) VALUES (?,?,?)");
+            statement.setInt(1, product.getTransaction().getTransactionId());
+            statement.setInt(2, product.getProduct().getProductId());
+            statement.setInt(3, product.getQuantity());
+            statement.execute();
+
+            return product;
         }
     }
 

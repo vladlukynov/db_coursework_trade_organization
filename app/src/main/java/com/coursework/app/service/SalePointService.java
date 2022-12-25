@@ -56,4 +56,8 @@ public class SalePointService {
         }
         return point;
     }
+
+    public void changeSalePointProductQuantity(int productId, int salePointId, int quantity) throws SQLException {
+        salePointRepository.changeSalePointProductQuantity(productId, salePointId, quantity);
+    }
 }

@@ -127,6 +127,17 @@ public class SalePointRepository {
         }
     }
 
+    public void changeSalePointProductQuantity(int productId, int salePointId, int quantity) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    UPDATE ProductsSalePoints SET Quantity=? WHERE ProductId=? AND SalePointId=?""");
+            statement.setInt(1, quantity);
+            statement.setInt(2, productId);
+            statement.setInt(3, salePointId);
+            statement.execute();
+        }
+    }
+
     public SalePoint getSalePointBySellerLogin(String sellerLogin) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
             PreparedStatement statement = connection.prepareStatement("""

@@ -8,6 +8,7 @@ import com.coursework.app.service.SalePointService;
 import com.coursework.app.service.TransactionService;
 import com.coursework.app.utils.StringConverterUtils;
 import com.coursework.app.utils.ViewUtils;
+import com.coursework.app.view.ViewControllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -57,6 +58,8 @@ public class SellerController {
         transactionDateColumn.setCellValueFactory(new PropertyValueFactory<>("transactionDate"));
         transactionDateColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.transactionDateConverter));
         transactionsTable.setItems(transactions);
+
+        ViewControllers.setSellerController(this);
     }
 
     @FXML
@@ -84,11 +87,11 @@ public class SellerController {
     @FXML
     private void salesTabSelected() {
         if (salesTab.isSelected()) {
-            transactionsTableUpdate();
+            updateTransactionsTable();
         }
     }
 
-    protected void transactionsTableUpdate() {
+    protected void updateTransactionsTable() {
         try {
             transactions.clear();
             transactions.addAll(transactionService.getSellerTransaction(TradeOrganizationApp.getUser().getUserLogin()));
