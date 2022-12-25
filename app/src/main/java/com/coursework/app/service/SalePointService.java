@@ -60,4 +60,12 @@ public class SalePointService {
     public void changeSalePointProductQuantity(int productId, int salePointId, int quantity) throws SQLException {
         salePointRepository.changeSalePointProductQuantity(productId, salePointId, quantity);
     }
+
+    public SalePoint getSalePointBySuperVisorLogin(String login) throws SQLException, NoSalePointByIdException {
+        SalePoint salePoint = salePointRepository.getSalePointBySuperVisorLogin(login);
+        if (salePoint == null) {
+            throw new NoSalePointByIdException("Не найдено торговых точек, где закреплен сотрудник " + login);
+        }
+        return salePoint;
+    }
 }

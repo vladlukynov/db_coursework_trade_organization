@@ -153,6 +153,22 @@ public class SalePointRepository {
         }
     }
 
+    public SalePoint getSalePointBySuperVisorLogin(String login) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT SalePointId FROM SuperVisors
+                        JOIN Sections ON SuperVisors.SectionId = Sections.SectionId
+                            JOIN Halls ON Sections.HallId = Halls.HallId
+                    WHERE UserLogin=?""");
+            statement.setString(1, login);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return getSalePointById(resultSet.getInt("SalePointId"));
+            }
+            return null;
+        }
+    }
+
     public int getSalePointProductQuantity(int salePointId, int productId) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
             PreparedStatement statement = connection.prepareStatement("""

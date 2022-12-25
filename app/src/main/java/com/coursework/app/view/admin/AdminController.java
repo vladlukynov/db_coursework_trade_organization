@@ -393,6 +393,9 @@ public class AdminController {
     public void updateEmployeesTable() {
         try {
             users.clear();
+            if (employeeStatusBox.getSelectionModel().getSelectedItem() == null) {
+                return;
+            }
             if (employeeStatusBox.getSelectionModel().isSelected(0)) {
                 users.addAll(userService.getUsers().stream().filter(User::getIsActive).toList());
             } else {

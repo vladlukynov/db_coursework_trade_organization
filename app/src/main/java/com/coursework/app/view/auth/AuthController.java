@@ -68,7 +68,13 @@ public class AuthController {
                     openWindow("seller/seller-view.fxml", "Продавец", ViewUtils.getStage(loginField),
                             true);
                 }
-                default -> System.out.println("Другие роли в разработке");
+                case "Руководитель" -> {
+                    TradeOrganizationApp.setUser(userService.getSuperVisorByLogin(login));
+                    openWindow("super_visor/super-visor-view.fxml", "Руководитель", ViewUtils.getStage(loginField),
+                            true);
+                }
+                case "Менеджер" -> new Alert(Alert.AlertType.INFORMATION, "Роль в разработке", ButtonType.OK).showAndWait();
+                default -> new Alert(Alert.AlertType.ERROR, "Ошибка аутентификации", ButtonType.OK).showAndWait();
             }
         } catch (IOException | SQLException | NoUserByLoginException exception) {
             exception.printStackTrace(System.err);
