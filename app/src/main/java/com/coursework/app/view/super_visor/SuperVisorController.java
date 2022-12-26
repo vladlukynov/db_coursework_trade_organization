@@ -1,22 +1,38 @@
 package com.coursework.app.view.super_visor;
 
 import com.coursework.app.TradeOrganizationApp;
+import com.coursework.app.entity.Request;
 import com.coursework.app.entity.SuperVisor;
 import com.coursework.app.exception.NoSalePointByIdException;
+import com.coursework.app.service.RequestService;
 import com.coursework.app.service.SalePointService;
 import com.coursework.app.utils.ViewUtils;
+import com.coursework.app.view.ViewControllers;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 public class SuperVisorController {
+    // Окно заявки
     @FXML
     private Tab requestsTab;
+    @FXML
+    private TableView<Request> requestsTable;
+    @FXML
+    private TableColumn<Request, Integer> requestIdColumn;
+    @FXML
+    private TableColumn<Request, LocalDate> createDateColumn;
+    @FXML
+    private TableColumn<Request, LocalDate> completeDateColumn;
+    private final ObservableList<Request> requests = FXCollections.observableArrayList();
+
+    // Окно аккаунт
     @FXML
     private Tab accountTab;
     @FXML
@@ -29,12 +45,48 @@ public class SuperVisorController {
     private Label salePointLabel;
     @FXML
     private Label sectionLabel;
-    private final SalePointService salePointService = new SalePointService();
 
+    // Сервисы для доступа к БД
+    private final SalePointService salePointService = new SalePointService();
+    private final RequestService requestService = new RequestService();
+
+    @FXML
+    protected void initialize() {
+        requestIdColumn.setCellValueFactory(new PropertyValueFactory<>("RequestId"));
+        createDateColumn.setCellValueFactory(new PropertyValueFactory<>("CreationDate"));
+        completeDateColumn.setCellValueFactory(new PropertyValueFactory<>("CompleteDate"));
+        requestsTable.setItems(requests);
+
+        ViewControllers.setSuperVisorController(this);
+    }
+
+
+    // Окно заявки
     @FXML
     protected void requestsTabSelected() {
         if (requestsTab.isSelected()) {
-            System.out.println("Заявки");
+            updateRequestsTable();
+        }
+    }
+
+    protected void updateRequestsTable() {
+        try {
+            requests.clear();
+            requests.addAll(requestService.getRequestsBySalePointId(
+                    salePointService.getSalePointBySuperVisorLogin(
+                            TradeOrganizationApp.getUser().getUserLogin()).getSalePointId()));
+        } catch (SQLException | NoSalePointByIdException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    @FXML
+    protected void createRequestClick() {
+        try {
+            ViewUtils.openWindow("super_visor/add-request-view.fxml", "Новая заявка",
+                    ViewUtils.getStage(requestsTable), false);
+        } catch (IOException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }
 
