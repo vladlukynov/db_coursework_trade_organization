@@ -55,4 +55,12 @@ public class UserService {
     public void deactivateUser(String login) throws SQLException {
         userRepository.changeActiveStatus(login, false);
     }
+
+    public boolean isSeller(String login) throws SQLException {
+        return userRepository.isSeller(login);
+    }
+
+    public boolean isSuperVisor(String login) throws SQLException {
+        return userRepository.isSuperVisor(login);
+    }
 }

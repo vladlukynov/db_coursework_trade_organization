@@ -35,7 +35,7 @@ public class UserRepository {
     public List<Seller> getSellers() throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
             PreparedStatement statement = connection.prepareStatement("""
-                    SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, Sellers.HallId FROM Sellers 
+                    SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, Sellers.HallId FROM Sellers
                         JOIN Users ON Sellers.UserLogin = Users.UserLogin""");
             ResultSet resultSet = statement.executeQuery();
             List<Seller> list = new ArrayList<>();
@@ -56,7 +56,7 @@ public class UserRepository {
     public List<SuperVisor> getSuperVisors() throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
             PreparedStatement statement = connection.prepareStatement("""
-                    SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, SuperVisors.SectionId FROM SuperVisors 
+                    SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, SuperVisors.SectionId FROM SuperVisors
                         JOIN Users ON SuperVisors.UserLogin = Users.UserLogin""");
             ResultSet resultSet = statement.executeQuery();
             List<SuperVisor> list = new ArrayList<>();
@@ -186,6 +186,30 @@ public class UserRepository {
             statement.setString(1, login);
             statement.setBoolean(2, status);
             statement.execute();
+        }
+    }
+
+    public boolean isSeller(String login) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+            PreparedStatement statement = connection.prepareStatement("SELECT EXISTS(SELECT * FROM Sellers WHERE UserLogin=?)");
+            statement.setString(1, login);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getBoolean(1);
+            }
+            return false;
+        }
+    }
+
+    public boolean isSuperVisor(String login) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+            PreparedStatement statement = connection.prepareStatement("SELECT EXISTS(SELECT * FROM SuperVisors WHERE UserLogin=?)");
+            statement.setString(1, login);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getBoolean(1);
+            }
+            return false;
         }
     }
 }

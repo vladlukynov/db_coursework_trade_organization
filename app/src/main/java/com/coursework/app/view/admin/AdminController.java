@@ -2,6 +2,7 @@ package com.coursework.app.view.admin;
 
 import com.coursework.app.TradeOrganizationApp;
 import com.coursework.app.entity.*;
+import com.coursework.app.exception.NoUserByLoginException;
 import com.coursework.app.service.*;
 import com.coursework.app.utils.StringConverterUtils;
 import com.coursework.app.utils.ViewUtils;
@@ -9,9 +10,12 @@ import com.coursework.app.view.ViewControllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -199,6 +203,49 @@ public class AdminController {
 
         ViewControllers.setAdminController(this);
         isInitialized = true;
+    }
+
+    @FXML
+    protected void informationButtonClick() {
+        User user = employeeTable.getSelectionModel().getSelectedItem();
+
+        if (user == null) {
+            return;
+        }
+
+        try {
+            if (userService.isSeller(user.getUserLogin())) {
+                Seller seller = userService.getSellerByLogin(user.getUserLogin());
+
+                FXMLLoader fxmlLoader = new FXMLLoader(TradeOrganizationApp.class.getResource("admin/employee-information-view.fxml"));
+                Scene scene = new Scene(fxmlLoader.load());
+                EmployeeInformationController controller = fxmlLoader.getController();
+                controller.seller(seller);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.setTitle("Информация о продавце");
+                stage.setResizable(false);
+                stage.show();
+
+                return;
+            }
+
+            if (userService.isSuperVisor(user.getUserLogin())) {
+                SuperVisor superVisor = userService.getSuperVisorByLogin(user.getUserLogin());
+
+                FXMLLoader fxmlLoader = new FXMLLoader(TradeOrganizationApp.class.getResource("admin/employee-information-view.fxml"));
+                Scene scene = new Scene(fxmlLoader.load());
+                EmployeeInformationController controller = fxmlLoader.getController();
+                controller.superVisor(superVisor);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.setTitle("Информация о руководителе");
+                stage.setResizable(false);
+                stage.show();
+            }
+        } catch (SQLException | IOException | NoUserByLoginException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
     }
 
     @FXML
