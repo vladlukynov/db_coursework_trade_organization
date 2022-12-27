@@ -1,7 +1,7 @@
 package com.coursework.app.service;
 
-import com.coursework.app.entity.Product;
 import com.coursework.app.entity.SalePoint;
+import com.coursework.app.entity.SalePointProduct;
 import com.coursework.app.exception.AddSalePointException;
 import com.coursework.app.exception.NoSalePointByIdException;
 import com.coursework.app.utils.DBProperties;
@@ -32,7 +32,6 @@ public class SalePointServiceTest {
                               int countersNumber, boolean isActive, String name) {
     }
 
-    private final ProductService productService = new ProductService();
     private final SalePointService salePointService = new SalePointService();
 
     @BeforeEach
@@ -202,15 +201,15 @@ public class SalePointServiceTest {
         try {
             final int SALE_POINT_ID = 2;
 
-            List<Product> products = salePointService.getSalePointProducts(SALE_POINT_ID);
+            List<SalePointProduct> products = salePointService.getSalePointProducts(SALE_POINT_ID);
 
             List<Product_> products_ = new ArrayList<>();
             products_.add(new Product_(5, "Шоколад", true));
 
             for (int i = 0; i < products.size(); i++) {
-                assertEquals(products.get(i).getProductId(), products_.get(i).productId);
-                assertEquals(products.get(i).getProductName(), products_.get(i).productName);
-                assertEquals(products.get(i).getIsActive(), products_.get(i).isActive);
+                assertEquals(products.get(i).getProduct().getProductId(), products_.get(i).productId);
+                assertEquals(products.get(i).getProduct().getProductName(), products_.get(i).productName);
+                assertEquals(products.get(i).getProduct().getIsActive(), products_.get(i).isActive);
             }
         } catch (SQLException exception) {
             fail(exception.getMessage());

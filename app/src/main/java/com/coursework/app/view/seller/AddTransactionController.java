@@ -49,7 +49,8 @@ public class AddTransactionController {
             productNameColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productNameStringConverter));
             productQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
-            productBox.getItems().addAll(salePointService.getSalePointProducts(salePoint.getSalePointId()).stream().filter(Product::getIsActive).toList());
+            salePointService.getSalePointProducts(salePoint.getSalePointId()).stream().filter(product -> product.getProduct().getIsActive())
+                    .toList().forEach(product -> productBox.getItems().add(product.getProduct()));
             productBox.setConverter(StringConverterUtils.productNameStringConverter);
 
             productTable.setItems(transactionProducts);

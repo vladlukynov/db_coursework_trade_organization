@@ -1,6 +1,5 @@
 package com.coursework.app.repository;
 
-import com.coursework.app.entity.Product;
 import com.coursework.app.entity.SalePoint;
 import com.coursework.app.entity.SalePointProduct;
 import com.coursework.app.utils.DBProperties;
@@ -84,15 +83,19 @@ public class SalePointRepository {
         }
     }
 
-    public List<Product> getSalePointProducts(int salePointId) throws SQLException {
+    public List<SalePointProduct> getSalePointProducts(int salePointId) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
             PreparedStatement statement = connection.prepareStatement("""
-                    SELECT ProductId FROM ProductsSalePoints WHERE SalePointId=?""");
+                    SELECT * FROM ProductsSalePoints WHERE SalePointId=?""");
             statement.setInt(1, salePointId);
             ResultSet resultSet = statement.executeQuery();
-            List<Product> list = new ArrayList<>();
+            List<SalePointProduct> list = new ArrayList<>();
             while (resultSet.next()) {
-                list.add(productRepository.getProductById(resultSet.getInt("ProductId")));
+                list.add(new SalePointProduct(productRepository.getProductById(resultSet.getInt("ProductId")),
+                        getSalePointById(resultSet.getInt("SalePointId")),
+                        resultSet.getInt("Quantity"),
+                        resultSet.getDouble("Price"),
+                        resultSet.getDouble("Discount")));
             }
             return list;
         }

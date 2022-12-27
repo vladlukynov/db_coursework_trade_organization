@@ -38,7 +38,7 @@
                </padding>
             </VBox>
          </content></Tab>
-      <Tab text="Товары">
+      <Tab fx:id="productsTab" onSelectionChanged="#productsTabSelected" text="Товары">
         <content>
             <VBox>
                <children>

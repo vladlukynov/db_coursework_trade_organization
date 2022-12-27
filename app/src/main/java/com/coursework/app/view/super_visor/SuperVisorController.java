@@ -35,6 +35,8 @@ public class SuperVisorController {
 
     // Окно товары
     @FXML
+    private Tab productsTab;
+    @FXML
     private TableView<SalePointProduct> productsTable;
     @FXML
     private TableColumn<SalePointProduct, Product> productNameColumn;
@@ -108,6 +110,25 @@ public class SuperVisorController {
             ViewUtils.openWindow("super_visor/add-request-view.fxml", "Новая заявка",
                     ViewUtils.getStage(requestsTable), false);
         } catch (IOException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    // Окно товары
+
+    @FXML
+    protected void productsTabSelected() {
+        if (productsTab.isSelected()) {
+            updateProductsTable();
+        }
+    }
+
+    protected void updateProductsTable() {
+        try {
+            products.clear();
+            products.addAll(salePointService.getSalePointProducts(
+                    salePointService.getSalePointBySuperVisorLogin(TradeOrganizationApp.getUser().getUserLogin()).getSalePointId()));
+        } catch (SQLException | NoSalePointByIdException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }

@@ -1,6 +1,5 @@
 package com.coursework.app.service;
 
-import com.coursework.app.entity.Product;
 import com.coursework.app.entity.SalePoint;
 import com.coursework.app.entity.SalePointProduct;
 import com.coursework.app.exception.AddSalePointException;
@@ -41,7 +40,7 @@ public class SalePointService {
         return salePointRepository.addSalePointProduct(product);
     }
 
-    public List<Product> getSalePointProducts(int id) throws SQLException {
+    public List<SalePointProduct> getSalePointProducts(int id) throws SQLException {
         return salePointRepository.getSalePointProducts(id);
     }
 
