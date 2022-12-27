@@ -2,9 +2,7 @@ package com.coursework.app.service;
 
 import com.coursework.app.entity.Product;
 import com.coursework.app.entity.SalePoint;
-import com.coursework.app.entity.SalePointProduct;
 import com.coursework.app.exception.AddSalePointException;
-import com.coursework.app.exception.NoProductByIdException;
 import com.coursework.app.exception.NoSalePointByIdException;
 import com.coursework.app.utils.DBProperties;
 import org.apache.commons.io.FileUtils;

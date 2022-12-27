@@ -3,7 +3,6 @@ package com.coursework.app.service;
 import com.coursework.app.entity.Hall;
 import com.coursework.app.exception.AddHallException;
 import com.coursework.app.exception.NoHallByIdException;
-import com.coursework.app.exception.NoRoleByIdException;
 import com.coursework.app.utils.DBProperties;
 import org.junit.jupiter.api.*;
 
