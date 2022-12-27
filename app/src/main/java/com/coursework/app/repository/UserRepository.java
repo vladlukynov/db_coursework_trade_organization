@@ -223,8 +223,8 @@ public class UserRepository {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
             PreparedStatement statement = connection.prepareStatement("""
                     UPDATE Users SET IsActive = ? WHERE UserLogin = ?""");
-            statement.setString(1, login);
-            statement.setBoolean(2, status);
+            statement.setBoolean(1, status);
+            statement.setString(2, login);
             statement.execute();
         }
     }

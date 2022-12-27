@@ -132,7 +132,7 @@ public class ChangeEmployeeDataController {
                     new Alert(Alert.AlertType.INFORMATION, "Секция не выбрана", ButtonType.OK).showAndWait();
                     return;
                 }
-                userService.updateSupervisor(new SuperVisor(login, password, name[1], name[0], name[2], role, true, section),
+                userService.updateSupervisor(new SuperVisor(login, password, name[1], name[0], name[2], role, user.getIsActive(), section),
                         user.getUserLogin());
             } else if (role.getRoleName().equals("Продавец")) {
                 Hall hall = hallBox.getSelectionModel().getSelectedItem();
@@ -140,10 +140,10 @@ public class ChangeEmployeeDataController {
                     new Alert(Alert.AlertType.INFORMATION, "Зал не выбран", ButtonType.OK).showAndWait();
                     return;
                 }
-                userService.updateSeller(new Seller(login, password, name[1], name[0], name[2], role, true, hall),
+                userService.updateSeller(new Seller(login, password, name[1], name[0], name[2], role, user.getIsActive(), hall),
                         user.getUserLogin());
             } else {
-                userService.updateUser(new User(login, password, name[1], name[0], name[2], role, true),
+                userService.updateUser(new User(login, password, name[1], name[0], name[2], role, user.getIsActive()),
                         user.getUserLogin());
             }
 
