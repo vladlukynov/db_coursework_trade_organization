@@ -153,6 +153,22 @@ public class UserRepository {
         }
     }
 
+    public void updateUser(User user, String oldLogin) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    UPDATE Users SET UserLogin=?, Password=?, FirstName=?, LastName=?, MiddleName=?, RoleId=?, IsActive=? WHERE UserLogin=?""");
+            statement.setString(1, user.getUserLogin());
+            statement.setString(2, user.getPassword());
+            statement.setString(3, user.getFirstName());
+            statement.setString(4, user.getLastName());
+            statement.setString(5, user.getMiddleName());
+            statement.setInt(6, user.getRole().getRoleId());
+            statement.setBoolean(7, user.getIsActive());
+            statement.setString(8, oldLogin);
+            statement.execute();
+        }
+    }
+
     public Seller addSeller(Seller seller) throws SQLException {
         addUser(seller);
         try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
@@ -166,6 +182,18 @@ public class UserRepository {
         }
     }
 
+    public void updateSeller(Seller seller, String oldLogin) throws SQLException {
+        updateUser(seller, oldLogin);
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    UPDATE Sellers SET UserLogin=?, HallId=? WHERE UserLogin=?""");
+            statement.setString(1, seller.getUserLogin());
+            statement.setInt(2, seller.getHall().getHallId());
+            statement.setString(3, oldLogin);
+            statement.execute();
+        }
+    }
+
     public SuperVisor addSuperVisor(SuperVisor superVisor) throws SQLException {
         addUser(superVisor);
         try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
@@ -176,6 +204,18 @@ public class UserRepository {
             statement.execute();
 
             return superVisor;
+        }
+    }
+
+    public void updateSuperVisor(SuperVisor supervisor, String oldLogin) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+            updateUser(supervisor, oldLogin);
+            PreparedStatement statement = connection.prepareStatement("""
+                    UPDATE SuperVisors SET UserLogin=?, SectionId=? WHERE UserLogin=?""");
+            statement.setString(1, supervisor.getUserLogin());
+            statement.setInt(2, supervisor.getSection().getSectionId());
+            statement.setString(3, oldLogin);
+            statement.execute();
         }
     }
 

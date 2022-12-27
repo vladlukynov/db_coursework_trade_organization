@@ -205,6 +205,8 @@ public class AdminController {
         isInitialized = true;
     }
 
+
+    // Окно сотрудники
     @FXML
     protected void informationButtonClick() {
         User user = employeeTable.getSelectionModel().getSelectedItem();
@@ -244,6 +246,16 @@ public class AdminController {
                 stage.show();
             }
         } catch (SQLException | IOException | NoUserByLoginException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    @FXML
+    protected void employeeDataChangeButton() {
+        try {
+            ViewUtils.openWindow("admin/change-employee-data-view.fxml", "Изменение информации о сотруднике",
+                    ViewUtils.getStage(loginLabel), false);
+        } catch (IOException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }
@@ -633,5 +645,9 @@ public class AdminController {
 
     protected Hall getSelectedSectionHall() {
         return sectionHallBox.getSelectionModel().getSelectedItem();
+    }
+
+    protected User getSelectedEmployee() {
+        return employeeTable.getSelectionModel().getSelectedItem();
     }
 }

@@ -44,12 +44,24 @@ public class UserService {
         return userRepository.addUser(user);
     }
 
+    public void updateUser(User user, String oldLogin) throws SQLException {
+        userRepository.updateUser(user, oldLogin);
+    }
+
     public Seller addSeller(Seller seller) throws SQLException {
         return userRepository.addSeller(seller);
     }
 
+    public void updateSeller(Seller seller, String oldLogin) throws SQLException {
+        userRepository.updateSeller(seller, oldLogin);
+    }
+
     public SuperVisor addSuperVisor(SuperVisor superVisor) throws SQLException {
         return userRepository.addSuperVisor(superVisor);
+    }
+
+    public void updateSupervisor(SuperVisor superVisor, String oldLogin) throws SQLException {
+        userRepository.updateSuperVisor(superVisor, oldLogin);
     }
 
     public void deactivateUser(String login) throws SQLException {
