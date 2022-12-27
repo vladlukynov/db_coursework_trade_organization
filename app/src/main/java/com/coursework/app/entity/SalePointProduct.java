@@ -5,12 +5,14 @@ public class SalePointProduct {
     private final SalePoint salePoint;
     private final int quantity;
     private final double price;
+    private final double discount;
 
-    public SalePointProduct(Product product, SalePoint salePoint, int quantity, double price) {
+    public SalePointProduct(Product product, SalePoint salePoint, int quantity, double price, double discount) {
         this.product = product;
         this.salePoint = salePoint;
         this.quantity = quantity;
         this.price = price;
+        this.discount = discount;
     }
 
     public Product getProduct() {
@@ -27,5 +29,9 @@ public class SalePointProduct {
 
     public double getPrice() {
         return price;
+    }
+
+    public double getDiscount() {
+        return discount;
     }
 }

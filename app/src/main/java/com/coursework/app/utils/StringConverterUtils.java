@@ -5,7 +5,6 @@ import javafx.util.StringConverter;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 public class StringConverterUtils {
     public static StringConverter<Role> roleStringConverter = new StringConverter<>() {
@@ -104,7 +103,7 @@ public class StringConverterUtils {
         }
     };
 
-    public static StringConverter<LocalDate> transactionDateConverter = new StringConverter<LocalDate>() {
+    public static StringConverter<LocalDate> transactionDateConverter = new StringConverter<>() {
         @Override
         public String toString(LocalDate localDate) {
             return localDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
@@ -112,6 +111,18 @@ public class StringConverterUtils {
 
         @Override
         public LocalDate fromString(String s) {
+            return null;
+        }
+    };
+
+    public static StringConverter<Double> productDiscountConverter = new StringConverter<>() {
+        @Override
+        public String toString(Double double_) {
+            return double_ + " %";
+        }
+
+        @Override
+        public Double fromString(String s) {
             return null;
         }
     };

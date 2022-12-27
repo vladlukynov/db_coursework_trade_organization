@@ -111,14 +111,15 @@ public class SalePointRepository {
                 statement.setInt(2, product.getSalePoint().getSalePointId());
                 statement.setInt(3, product.getProduct().getProductId());
                 product_ = new SalePointProduct(product.getProduct(), product.getSalePoint(),
-                        newQuantity, product.getPrice());
+                        newQuantity, product.getPrice(), product.getDiscount());
             } else {
                 statement = connection.prepareStatement("""
-                        INSERT INTO ProductsSalePoints(ProductId, SalePointId, Quantity, Price)  VALUES (?,?,?,?)""");
+                        INSERT INTO ProductsSalePoints(ProductId, SalePointId, Quantity, Price, Quantity)  VALUES (?,?,?,?,?)""");
                 statement.setInt(1, product.getProduct().getProductId());
                 statement.setInt(2, product.getSalePoint().getSalePointId());
                 statement.setInt(3, product.getQuantity());
                 statement.setDouble(4, product.getPrice());
+                statement.setDouble(5, product.getDiscount());
                 product_ = product;
             }
             statement.execute();

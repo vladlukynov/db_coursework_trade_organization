@@ -1,11 +1,11 @@
 package com.coursework.app.view.super_visor;
 
 import com.coursework.app.TradeOrganizationApp;
-import com.coursework.app.entity.Request;
-import com.coursework.app.entity.SuperVisor;
+import com.coursework.app.entity.*;
 import com.coursework.app.exception.NoSalePointByIdException;
 import com.coursework.app.service.RequestService;
 import com.coursework.app.service.SalePointService;
+import com.coursework.app.utils.StringConverterUtils;
 import com.coursework.app.utils.ViewUtils;
 import com.coursework.app.view.ViewControllers;
 import javafx.collections.FXCollections;
@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -31,6 +32,19 @@ public class SuperVisorController {
     @FXML
     private TableColumn<Request, LocalDate> completeDateColumn;
     private final ObservableList<Request> requests = FXCollections.observableArrayList();
+
+    // Окно товары
+    @FXML
+    private TableView<SalePointProduct> productsTable;
+    @FXML
+    private TableColumn<SalePointProduct, Product> productNameColumn;
+    @FXML
+    private TableColumn<SalePointProduct, Integer> productQuantityColumn;
+    @FXML
+    private TableColumn<SalePointProduct, Double> productPriceColumn;
+    @FXML
+    private TableColumn<SalePointProduct, Double> productDiscountColumn;
+    private final ObservableList<SalePointProduct> products = FXCollections.observableArrayList();
 
     // Окно аккаунт
     @FXML
@@ -52,6 +66,14 @@ public class SuperVisorController {
 
     @FXML
     protected void initialize() {
+        productNameColumn.setCellValueFactory(new PropertyValueFactory<>("product"));
+        productNameColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productNameStringConverter));
+        productQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        productPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        productDiscountColumn.setCellValueFactory(new PropertyValueFactory<>("discount"));
+        productDiscountColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productDiscountConverter));
+        productsTable.setItems(products);
+
         requestIdColumn.setCellValueFactory(new PropertyValueFactory<>("RequestId"));
         createDateColumn.setCellValueFactory(new PropertyValueFactory<>("CreationDate"));
         completeDateColumn.setCellValueFactory(new PropertyValueFactory<>("CompleteDate"));
