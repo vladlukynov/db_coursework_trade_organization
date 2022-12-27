@@ -22,7 +22,7 @@
                      <children>
                         <ComboBox fx:id="employeeStatusBox" prefWidth="150.0" promptText="Статус" />
                         <Button mnemonicParsing="false" onAction="#onDismissEmployeeButtonClick" text="Уволить" />
-                        <Button mnemonicParsing="false" onAction="#onRegisterEmployeeButtonClick" text="Регистриация сотрудника" />
+                        <Button mnemonicParsing="false" onAction="#onRegisterEmployeeButtonClick" text="Регистрация сотрудника" />
                      </children>
                   </HBox>
                   <TableView fx:id="employeeTable" VBox.vgrow="ALWAYS">
