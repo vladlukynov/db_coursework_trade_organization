@@ -3,6 +3,10 @@ package com.coursework.app.utils;
 import com.coursework.app.entity.*;
 import javafx.util.StringConverter;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
 public class StringConverterUtils {
     public static StringConverter<Role> roleStringConverter = new StringConverter<>() {
         @Override
@@ -67,7 +71,7 @@ public class StringConverterUtils {
     public static StringConverter<SalePoint> salePointNameStringConverter = new StringConverter<>() {
         @Override
         public String toString(SalePoint salePoint) {
-            return salePoint.getName();
+            return salePoint.getSalePointName();
         }
 
         @Override
@@ -96,6 +100,18 @@ public class StringConverterUtils {
 
         @Override
         public Section fromString(String s) {
+            return null;
+        }
+    };
+
+    public static StringConverter<LocalDate> transactionDateConverter = new StringConverter<LocalDate>() {
+        @Override
+        public String toString(LocalDate localDate) {
+            return localDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        }
+
+        @Override
+        public LocalDate fromString(String s) {
             return null;
         }
     };

@@ -2,17 +2,39 @@ package com.coursework.app.view.seller;
 
 import com.coursework.app.TradeOrganizationApp;
 import com.coursework.app.entity.Seller;
-import com.coursework.app.service.UserService;
+import com.coursework.app.entity.Transaction;
+import com.coursework.app.exception.NoSalePointByIdException;
+import com.coursework.app.service.SalePointService;
+import com.coursework.app.service.TransactionService;
+import com.coursework.app.utils.StringConverterUtils;
 import com.coursework.app.utils.ViewUtils;
+import com.coursework.app.view.ViewControllers;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 public class SellerController {
+    // Окно продажи
+    @FXML
+    private Tab salesTab;
+    @FXML
+    private TableView<Transaction> transactionsTable;
+    @FXML
+    private TableColumn<Transaction, Integer> transactionIdColumn;
+    @FXML
+    private TableColumn<Transaction, LocalDate> transactionDateColumn;
+    private final ObservableList<Transaction> transactions = FXCollections.observableArrayList();
+
+    // Окно аккаунт
+    @FXML
+    private Tab accountTab;
     @FXML
     private Label loginLabel;
 
@@ -27,11 +49,17 @@ public class SellerController {
 
     @FXML
     private Label salePointLabel;
-    private final UserService userService = new UserService();
+    private final SalePointService salePointService = new SalePointService();
+    private final TransactionService transactionService = new TransactionService();
 
     @FXML
     protected void initialize() {
-        updateAccountPage();
+        transactionIdColumn.setCellValueFactory(new PropertyValueFactory<>("transactionId"));
+        transactionDateColumn.setCellValueFactory(new PropertyValueFactory<>("transactionDate"));
+        transactionDateColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.transactionDateConverter));
+        transactionsTable.setItems(transactions);
+
+        ViewControllers.setSellerController(this);
     }
 
     @FXML
@@ -55,6 +83,31 @@ public class SellerController {
         }
     }
 
+    // Окно продажи
+    @FXML
+    private void salesTabSelected() {
+        if (salesTab.isSelected()) {
+            updateTransactionsTable();
+        }
+    }
+
+    protected void updateTransactionsTable() {
+        try {
+            transactions.clear();
+            transactions.addAll(transactionService.getSellerTransaction(TradeOrganizationApp.getUser().getUserLogin()));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    // Окно аккаунт
+    @FXML
+    private void accountTabSelected() {
+        if (accountTab.isSelected()) {
+            updateAccountPage();
+        }
+    }
+
     private void updateAccountPage() {
         try {
             Seller seller = (Seller) TradeOrganizationApp.getUser();
@@ -62,8 +115,8 @@ public class SellerController {
             hallLabel.setText("Зал: " + seller.getHall().getHallName());
             nameLabel.setText("ФИО: " + seller.getLastName() + " " + seller.getFirstName() + " " + seller.getMiddleName());
             roleLabel.setText("Роль в системе: " + seller.getRole().getRoleName());
-            salePointLabel.setText("Торговая точка: " + userService.getSellerSalePoint(seller.getUserLogin()).getName());
-        } catch (SQLException exception) {
+            salePointLabel.setText("Торговая точка: " + salePointService.getSalePointBySellerLogin(seller.getUserLogin()).getSalePointName());
+        } catch (SQLException | NoSalePointByIdException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }

@@ -25,7 +25,7 @@ public class SupplierProduct {
         return price;
     }
 
-    public boolean isActive() {
+    public boolean getIsActive() {
         return isActive;
     }
 }

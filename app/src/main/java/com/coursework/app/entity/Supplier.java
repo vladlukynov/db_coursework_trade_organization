@@ -20,6 +20,10 @@ public class Supplier {
         return supplierId;
     }
 
+    public void setSupplierId(int supplierId) {
+        this.supplierId = supplierId;
+    }
+
     public String getSupplierName() {
         return supplierName;
     }

@@ -22,15 +22,15 @@ public class Transaction {
         return transactionId;
     }
 
+    public void setTransactionId(int transactionId) {
+        this.transactionId = transactionId;
+    }
+
     public Seller getSeller() {
         return seller;
     }
 
     public LocalDate getTransactionDate() {
         return transactionDate;
-    }
-
-    public void setTransactionId(int transactionId) {
-        this.transactionId = transactionId;
     }
 }

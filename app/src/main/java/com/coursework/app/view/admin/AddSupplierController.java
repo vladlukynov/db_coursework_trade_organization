@@ -1,6 +1,7 @@
 package com.coursework.app.view.admin;
 
 import com.coursework.app.entity.Supplier;
+import com.coursework.app.exception.AddSupplierException;
 import com.coursework.app.service.SupplierService;
 import com.coursework.app.utils.ViewUtils;
 import com.coursework.app.view.ViewControllers;
@@ -27,9 +28,9 @@ public class AddSupplierController {
 
         try {
             supplierService.addSupplier(new Supplier(name, true));
-            ViewControllers.getAdminController().initializeSupplierBox();
+            ViewControllers.getAdminController().updateSupplierBox();
             ViewUtils.getStage(supplierNameField).close();
-        } catch (SQLException exception) {
+        } catch (SQLException | AddSupplierException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }

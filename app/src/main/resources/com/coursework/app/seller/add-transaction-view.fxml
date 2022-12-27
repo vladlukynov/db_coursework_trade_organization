@@ -11,8 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<VBox alignment="CENTER" prefHeight="430.0" prefWidth="626.0" spacing="10.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coursework.app.view.seller.AddTransactionController">
+<VBox fx:id="primaryLayout" alignment="CENTER" prefHeight="430.0" prefWidth="626.0" spacing="10.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coursework.app.view.seller.AddTransactionController">
    <children>
       <Label text="Добавление товаров">
          <font>
@@ -28,8 +27,8 @@
       </HBox>
       <TableView fx:id="productTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
         <columns>
-          <TableColumn fx:id="productName" prefWidth="75.0" text="Наименование товара" />
-          <TableColumn fx:id="productQuantity" prefWidth="75.0" text="Количество" />
+          <TableColumn fx:id="productNameColumn" prefWidth="75.0" text="Наименование товара" />
+          <TableColumn fx:id="productQuantityColumn" prefWidth="75.0" text="Количество" />
         </columns>
          <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

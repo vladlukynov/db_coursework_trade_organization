@@ -2,8 +2,9 @@ package com.coursework.app.view.admin;
 
 import com.coursework.app.entity.SalePoint;
 import com.coursework.app.entity.SalePointType;
+import com.coursework.app.exception.AddSalePointException;
 import com.coursework.app.service.SalePointService;
-import com.coursework.app.service.SalePointTypesService;
+import com.coursework.app.service.SalePointTypeService;
 import com.coursework.app.utils.StringConverterUtils;
 import com.coursework.app.utils.ViewUtils;
 import com.coursework.app.view.ViewControllers;
@@ -32,7 +33,7 @@ public class AddSalePointController {
 
     @FXML
     private ComboBox<SalePointType> type;
-    private final SalePointTypesService salePointTypesService = new SalePointTypesService();
+    private final SalePointTypeService salePointTypesService = new SalePointTypeService();
     private final SalePointService salePointService = new SalePointService();
 
     @FXML
@@ -67,10 +68,10 @@ public class AddSalePointController {
             return;
         }
         try {
-            salePointService.addSalePoint(new SalePoint(name, salePointType, pointSize, rental, communalService, countersNumber, true));
-            ViewControllers.getAdminController().updateSalePointPage();
+            salePointService.addSalePoint(new SalePoint(salePointType, pointSize, rental, communalService, countersNumber, true, name));
+            ViewControllers.getAdminController().updateSalePointsTable();
             ViewUtils.getStage(rentalPrice).close();
-        } catch (SQLException exception) {
+        } catch (SQLException | AddSalePointException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }

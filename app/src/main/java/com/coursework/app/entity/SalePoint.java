@@ -2,41 +2,41 @@ package com.coursework.app.entity;
 
 public class SalePoint {
     private int salePointId;
-    private final String name;
     private final SalePointType type;
     private final double pointSize;
     private final double rentalPrice;
-    private final double comServ;
-    private final int counters;
+    private final double communalService;
+    private final int countersNumber;
     private final boolean isActive;
+    private final String salePointName;
 
-    public SalePoint(String name, SalePointType type, double pointSize, double rentalPrice, double comServ, int counters, boolean isActive) {
+    public SalePoint(SalePointType type, double pointSize, double rentalPrice, double communalService, int countersNumber, boolean isActive, String salePointName) {
         this.type = type;
-        this.name = name;
         this.pointSize = pointSize;
         this.rentalPrice = rentalPrice;
-        this.comServ = comServ;
-        this.counters = counters;
+        this.communalService = communalService;
+        this.countersNumber = countersNumber;
         this.isActive = isActive;
+        this.salePointName = salePointName;
     }
 
-    public SalePoint(int salePointId, String name, SalePointType type, double pointSize, double rentalPrice, double comServ, int counters, boolean isActive) {
+    public SalePoint(int salePointId, SalePointType type, double pointSize, double rentalPrice, double communalService, int countersNumber, boolean isActive, String salePointName) {
         this.salePointId = salePointId;
-        this.name = name;
         this.type = type;
         this.pointSize = pointSize;
         this.rentalPrice = rentalPrice;
-        this.comServ = comServ;
-        this.counters = counters;
+        this.communalService = communalService;
+        this.countersNumber = countersNumber;
         this.isActive = isActive;
+        this.salePointName = salePointName;
     }
 
     public int getSalePointId() {
         return salePointId;
     }
 
-    public String getName() {
-        return name;
+    public void setSalePointId(int salePointId) {
+        this.salePointId = salePointId;
     }
 
     public SalePointType getType() {
@@ -51,15 +51,19 @@ public class SalePoint {
         return rentalPrice;
     }
 
-    public double getComServ() {
-        return comServ;
+    public double getCommunalService() {
+        return communalService;
     }
 
-    public int getCounters() {
-        return counters;
+    public int getCountersNumber() {
+        return countersNumber;
     }
 
     public boolean getIsActive() {
         return isActive;
+    }
+
+    public String getSalePointName() {
+        return salePointName;
     }
 }

@@ -1,6 +1,8 @@
 package com.coursework.app.view.admin;
 
 import com.coursework.app.entity.Hall;
+import com.coursework.app.entity.SalePoint;
+import com.coursework.app.exception.AddHallException;
 import com.coursework.app.service.HallService;
 import com.coursework.app.utils.ViewUtils;
 import com.coursework.app.view.ViewControllers;
@@ -20,23 +22,24 @@ public class AddHallController {
     protected void onAddButtonClick() {
         try {
             String name = nameField.getText().trim();
+            SalePoint salePoint = ViewControllers.getAdminController().getSelectedHallSalePoint();
 
             if (name.isBlank()) {
                 new Alert(Alert.AlertType.INFORMATION, "Введите наименование зала", ButtonType.OK).showAndWait();
                 return;
             }
 
-            if (ViewControllers.getAdminController().getSelectedSalePoint() == null) {
+            if (salePoint == null) {
                 new Alert(Alert.AlertType.INFORMATION, "На главном окне не выбрана торговая точка",
                         ButtonType.OK).showAndWait();
                 ViewUtils.getStage(nameField).close();
                 return;
             }
 
-            hallService.addHall(new Hall(name, ViewControllers.getAdminController().getSelectedSalePoint(), true));
+            hallService.addHall(new Hall(name, salePoint, true));
             ViewControllers.getAdminController().updateHallsPage();
             ViewUtils.getStage(nameField).close();
-        } catch (SQLException exception) {
+        } catch (SQLException | AddHallException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
         }
     }
