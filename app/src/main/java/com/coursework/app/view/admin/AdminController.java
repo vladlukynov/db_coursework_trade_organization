@@ -265,6 +265,11 @@ public class AdminController {
         try {
             User user = employeeTable.getSelectionModel().getSelectedItem();
             if (user != null) {
+                if (user.getUserLogin().equals(TradeOrganizationApp.getUser().getUserLogin())) {
+                    new Alert(Alert.AlertType.INFORMATION, "Удалять самого себя плохая идея", ButtonType.OK).showAndWait();
+                    return;
+                }
+
                 userService.deactivateUser(user.getUserLogin());
                 updateEmployeesTable();
             }
