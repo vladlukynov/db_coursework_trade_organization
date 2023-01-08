@@ -11,7 +11,7 @@ public class ConsumerRepository {
     private final TransactionRepository transactionRepository = new TransactionRepository();
 
     public List<Consumer> getConsumers() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Consumers");
             ResultSet resultSet = statement.executeQuery();
             List<Consumer> list = new ArrayList<>();
@@ -27,7 +27,7 @@ public class ConsumerRepository {
     }
 
     public Consumer getConsumerById(int id) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Consumers WHERE ConsumerId = ?");
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -43,7 +43,7 @@ public class ConsumerRepository {
     }
 
     public List<Consumer> getConsumersByTransactionId(int id) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Consumers WHERE TransactionId = ?");
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -60,7 +60,7 @@ public class ConsumerRepository {
     }
 
     public Consumer addConsumer(Consumer consumer) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                             INSERT INTO Consumers(FirstName, LastName, MiddleName, TransactionId) VALUES (?,?,?,?)""",
                     Statement.RETURN_GENERATED_KEYS);

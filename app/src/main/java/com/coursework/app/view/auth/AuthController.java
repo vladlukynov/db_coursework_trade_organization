@@ -16,6 +16,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import static com.coursework.app.utils.ViewUtils.getStage;
 import static com.coursework.app.utils.ViewUtils.openWindow;
 
 public class AuthController {
@@ -73,7 +74,11 @@ public class AuthController {
                     openWindow("super_visor/super-visor-view.fxml", "Руководитель", ViewUtils.getStage(loginField),
                             true);
                 }
-                case "Менеджер" -> new Alert(Alert.AlertType.INFORMATION, "Роль в разработке", ButtonType.OK).showAndWait();
+                case "Менеджер" -> {
+                    TradeOrganizationApp.setUser(user);
+                    openWindow("manager/manager-view.fxml", "Менеджер", getStage(loginField),
+                            true);
+                }
                 default -> new Alert(Alert.AlertType.ERROR, "Ошибка аутентификации", ButtonType.OK).showAndWait();
             }
         } catch (IOException | SQLException | NoUserByLoginException exception) {

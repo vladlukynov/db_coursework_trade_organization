@@ -12,7 +12,7 @@ public class SupplierRepository {
     private final ProductRepository productRepository = new ProductRepository();
 
     public List<Supplier> getSuppliers() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Suppliers");
             ResultSet resultSet = statement.executeQuery();
             List<Supplier> list = new ArrayList<>();
@@ -26,7 +26,7 @@ public class SupplierRepository {
     }
 
     public Supplier getSupplierById(int id) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Suppliers WHERE SupplierId=?");
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -40,7 +40,7 @@ public class SupplierRepository {
     }
 
     public Supplier addSupplier(Supplier supplier) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO Suppliers(SupplierName, IsActive) VALUES (?,?)""", Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, supplier.getSupplierName());
@@ -56,7 +56,7 @@ public class SupplierRepository {
     }
 
     public void changeActiveStatus(int id, boolean status) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     UPDATE Suppliers SET IsActive=? WHERE SupplierId=?""");
             statement.setBoolean(1, status);
@@ -66,7 +66,7 @@ public class SupplierRepository {
     }
 
     public List<SupplierProduct> getSupplierProducts(int supplierId) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT * FROM SuppliersProducts WHERE SupplierId=?""");
             statement.setInt(1, supplierId);
@@ -83,7 +83,7 @@ public class SupplierRepository {
     }
 
     public void changeProductActiveStatus(int supplierId, int productId, boolean status) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     UPDATE SuppliersProducts SET IsActive=? WHERE SupplierId=? AND ProductId=?""");
             statement.setBoolean(1, status);
@@ -94,7 +94,7 @@ public class SupplierRepository {
     }
 
     public SupplierProduct addSupplierProduct(int supplierId, int productId, double price) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO SuppliersProducts (SupplierId, ProductId, Price, IsActive) VALUES (?,?,?,?)""");
             statement.setInt(1, supplierId);

@@ -13,7 +13,7 @@ public class SalePointRepository {
     private final ProductRepository productRepository = new ProductRepository();
 
     public List<SalePoint> getSalePoints() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM SalePoints");
             ResultSet resultSet = statement.executeQuery();
             List<SalePoint> list = new ArrayList<>();
@@ -32,7 +32,7 @@ public class SalePointRepository {
     }
 
     public SalePoint getSalePointById(int id) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM SalePoints WHERE SalePointId=?");
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -51,7 +51,7 @@ public class SalePointRepository {
     }
 
     public SalePoint addSalePoint(SalePoint salePoint) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO SalePoints(TypeId, PointSize, RentalPrice, CommunalService, CountersNumber, IsActive, SalePointName)
                         VALUES (?,?,?,?,?,?,?)""", Statement.RETURN_GENERATED_KEYS);
@@ -73,7 +73,7 @@ public class SalePointRepository {
     }
 
     public void changeActiveStatusById(int id, boolean status) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     UPDATE SalePoints SET IsActive=?
                         WHERE SalePointId=?""");
@@ -84,7 +84,7 @@ public class SalePointRepository {
     }
 
     public List<SalePointProduct> getSalePointProducts(int salePointId) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT * FROM ProductsSalePoints WHERE SalePointId=?""");
             statement.setInt(1, salePointId);
@@ -102,7 +102,7 @@ public class SalePointRepository {
     }
 
     public SalePointProduct addSalePointProduct(SalePointProduct product) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement;
             SalePointProduct product_;
             if (isExistsProduct(product.getSalePoint().getSalePointId(), product.getProduct().getProductId())) {
@@ -117,7 +117,7 @@ public class SalePointRepository {
                         newQuantity, product.getPrice(), product.getDiscount());
             } else {
                 statement = connection.prepareStatement("""
-                        INSERT INTO ProductsSalePoints(ProductId, SalePointId, Quantity, Price, Quantity)  VALUES (?,?,?,?,?)""");
+                        INSERT INTO ProductsSalePoints(ProductId, SalePointId, Quantity, Price, Discount)  VALUES (?,?,?,?,?)""");
                 statement.setInt(1, product.getProduct().getProductId());
                 statement.setInt(2, product.getSalePoint().getSalePointId());
                 statement.setInt(3, product.getQuantity());
@@ -132,7 +132,7 @@ public class SalePointRepository {
     }
 
     public void changeSalePointProductQuantity(int productId, int salePointId, int quantity) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     UPDATE ProductsSalePoints SET Quantity=? WHERE ProductId=? AND SalePointId=?""");
             statement.setInt(1, quantity);
@@ -143,7 +143,7 @@ public class SalePointRepository {
     }
 
     public SalePoint getSalePointBySellerLogin(String sellerLogin) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT Halls.SalePointId FROM Sellers
                         JOIN Halls ON Sellers.HallId = Halls.HallId
@@ -158,7 +158,7 @@ public class SalePointRepository {
     }
 
     public SalePoint getSalePointBySuperVisorLogin(String login) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT SalePointId FROM SuperVisors
                         JOIN Sections ON SuperVisors.SectionId = Sections.SectionId
@@ -174,7 +174,7 @@ public class SalePointRepository {
     }
 
     public int getSalePointProductQuantity(int salePointId, int productId) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT Quantity FROM ProductsSalePoints WHERE SalePointId = ? AND ProductId = ?""");
             statement.setInt(1, salePointId);
@@ -188,7 +188,7 @@ public class SalePointRepository {
     }
 
     private boolean isExistsProduct(int salePointId, int productId) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT EXISTS(SELECT * FROM ProductsSalePoints WHERE SalePointId = ? AND ProductId = ?)""");
             statement.setInt(1, salePointId);

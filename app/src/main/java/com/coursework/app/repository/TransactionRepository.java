@@ -15,7 +15,7 @@ public class TransactionRepository {
     private final ProductRepository productRepository = new ProductRepository();
 
     public List<Transaction> getSellerTransactions(String login) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT * FROM Transactions WHERE SellerLogin = ?""");
             statement.setString(1, login);
@@ -31,7 +31,7 @@ public class TransactionRepository {
     }
 
     public Transaction getTransactionById(int id) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT * FROM Transactions WHERE TransactionId = ?""");
             statement.setInt(1, id);
@@ -46,7 +46,7 @@ public class TransactionRepository {
     }
 
     public Transaction addTransaction(Transaction transaction) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO Transactions(SellerLogin, TransactionDate) VALUES (?,?)""", Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, transaction.getSeller().getUserLogin());
@@ -62,7 +62,7 @@ public class TransactionRepository {
     }
 
     public TransactionProduct addTransactionProduct(TransactionProduct product) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement(
                     "INSERT INTO TransactionsProducts(TransactionId, ProductId, Quantity) VALUES (?,?,?)");
             statement.setInt(1, product.getTransaction().getTransactionId());
@@ -75,7 +75,7 @@ public class TransactionRepository {
     }
 
     public List<TransactionProduct> getTransactionProducts(int transactionId) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM TransactionsProducts WHERE TransactionId = ?");
             statement.setInt(1, transactionId);
             ResultSet resultSet = statement.executeQuery();

@@ -14,7 +14,7 @@ public class RequestRepository {
     private final SalePointRepository salePointRepository = new SalePointRepository();
 
     public List<Request> getRequestsBySalePointId(int id) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT * FROM Requests WHERE SalePointId=?""");
             statement.setInt(1, id);
@@ -34,7 +34,7 @@ public class RequestRepository {
     }
 
     public Request addRequest(Request request) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO Requests (SalePointId, IsProcessed, CreationDate) VALUES (?,?,?)""", Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, request.getSalePoint().getSalePointId());
@@ -51,7 +51,7 @@ public class RequestRepository {
     }
 
     public RequestProduct addRequestProduct(RequestProduct product) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO RequestsProducts (RequestId, ProductId, Quantity) VALUES (?,?,?)""");
             statement.setInt(1, product.getRequest().getRequestId());

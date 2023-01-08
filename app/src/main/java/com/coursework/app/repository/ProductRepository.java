@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ProductRepository {
     public List<Product> getProducts() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Products");
             ResultSet resultSet = statement.executeQuery();
             List<Product> list = new ArrayList<>();
@@ -23,7 +23,7 @@ public class ProductRepository {
     }
 
     public Product getProductById(int id) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Products WHERE ProductId = ?");
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -37,7 +37,7 @@ public class ProductRepository {
     }
 
     public Product addProduct(Product product) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO Products(ProductName, IsActive) VALUES (?,?)""", Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, product.getProductName());
@@ -53,7 +53,7 @@ public class ProductRepository {
     }
 
     public void changeActiveStatus(int id, boolean status) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     UPDATE Products SET IsActive=? WHERE ProductId=?""");
             statement.setBoolean(1, status);

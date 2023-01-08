@@ -15,7 +15,7 @@ public class UserRepository {
     private final HallRepository hallRepository = new HallRepository();
 
     public List<User> getUsers() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Users");
             ResultSet resultSet = statement.executeQuery();
             List<User> list = new ArrayList<>();
@@ -33,7 +33,7 @@ public class UserRepository {
     }
 
     public List<Seller> getSellers() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, Sellers.HallId FROM Sellers
                         JOIN Users ON Sellers.UserLogin = Users.UserLogin""");
@@ -54,7 +54,7 @@ public class UserRepository {
     }
 
     public List<SuperVisor> getSuperVisors() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, SuperVisors.SectionId FROM SuperVisors
                         JOIN Users ON SuperVisors.UserLogin = Users.UserLogin""");
@@ -75,7 +75,7 @@ public class UserRepository {
     }
 
     public User getUserByLogin(String loginUser) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Users WHERE UserLogin = ?");
             statement.setString(1, loginUser);
             ResultSet resultSet = statement.executeQuery();
@@ -93,7 +93,7 @@ public class UserRepository {
     }
 
     public Seller getSellerByLogin(String login) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, Sellers.HallId FROM Sellers
                         JOIN Users ON Sellers.UserLogin = Users.UserLogin
@@ -115,7 +115,7 @@ public class UserRepository {
     }
 
     public SuperVisor getSuperVisorByLogin(String login) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, SuperVisors.SectionId FROM SuperVisors
                         JOIN Users ON SuperVisors.UserLogin = Users.UserLogin
@@ -137,7 +137,7 @@ public class UserRepository {
     }
 
     public User addUser(User user) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO Users(UserLogin, Password, FirstName, LastName, MiddleName, RoleId, IsActive) VALUES (?,?,?,?,?,?,?)""");
             statement.setString(1, user.getUserLogin());
@@ -154,7 +154,7 @@ public class UserRepository {
     }
 
     public void updateUser(User user, String oldLogin) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     UPDATE Users SET UserLogin=?, Password=?, FirstName=?, LastName=?, MiddleName=?, RoleId=?, IsActive=? WHERE UserLogin=?""");
             statement.setString(1, user.getUserLogin());
@@ -171,7 +171,7 @@ public class UserRepository {
 
     public Seller addSeller(Seller seller) throws SQLException {
         addUser(seller);
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO Sellers(UserLogin, HallId) VALUES (?,?)""");
             statement.setString(1, seller.getUserLogin());
@@ -184,7 +184,7 @@ public class UserRepository {
 
     public void updateSeller(Seller seller, String oldLogin) throws SQLException {
         updateUser(seller, oldLogin);
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     UPDATE Sellers SET UserLogin=?, HallId=? WHERE UserLogin=?""");
             statement.setString(1, seller.getUserLogin());
@@ -196,7 +196,7 @@ public class UserRepository {
 
     public SuperVisor addSuperVisor(SuperVisor superVisor) throws SQLException {
         addUser(superVisor);
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO SuperVisors(UserLogin, SectionId) VALUES (?,?)""");
             statement.setString(1, superVisor.getUserLogin());
@@ -208,7 +208,7 @@ public class UserRepository {
     }
 
     public void updateSuperVisor(SuperVisor supervisor, String oldLogin) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             updateUser(supervisor, oldLogin);
             PreparedStatement statement = connection.prepareStatement("""
                     UPDATE SuperVisors SET UserLogin=?, SectionId=? WHERE UserLogin=?""");
@@ -220,7 +220,7 @@ public class UserRepository {
     }
 
     public void changeActiveStatus(String login, boolean status) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     UPDATE Users SET IsActive = ? WHERE UserLogin = ?""");
             statement.setBoolean(1, status);
@@ -230,7 +230,7 @@ public class UserRepository {
     }
 
     public boolean isSeller(String login) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT EXISTS(SELECT * FROM Sellers WHERE UserLogin=?)");
             statement.setString(1, login);
             ResultSet resultSet = statement.executeQuery();
@@ -242,7 +242,7 @@ public class UserRepository {
     }
 
     public boolean isSuperVisor(String login) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT EXISTS(SELECT * FROM SuperVisors WHERE UserLogin=?)");
             statement.setString(1, login);
             ResultSet resultSet = statement.executeQuery();

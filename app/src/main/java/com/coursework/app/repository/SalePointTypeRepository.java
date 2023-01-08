@@ -9,7 +9,7 @@ import java.util.List;
 
 public class SalePointTypeRepository {
     public List<SalePointType> getSalePointTypes() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM SalePointTypes");
             ResultSet resultSet = statement.executeQuery();
             List<SalePointType> list = new ArrayList<>();
@@ -21,7 +21,7 @@ public class SalePointTypeRepository {
         }
     }
     public SalePointType getSalePointTypeById(int id) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM SalePointTypes WHERE TypeId = ?");
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();

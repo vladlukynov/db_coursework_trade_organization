@@ -9,7 +9,7 @@ import java.util.List;
 
 public class RoleRepository {
     public List<Role> getRoles() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Roles");
             ResultSet resultSet = statement.executeQuery();
             List<Role> list = new ArrayList<>();
@@ -22,7 +22,7 @@ public class RoleRepository {
     }
 
     public Role getRoleById(int id) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT * FROM Roles WHERE RoleId = ?""");
             statement.setInt(1, id);

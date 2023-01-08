@@ -11,7 +11,7 @@ public class HallRepository {
     private final SalePointRepository salePointRepository = new SalePointRepository();
 
     public List<Hall> getHalls() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Halls");
             ResultSet resultSet = statement.executeQuery();
             List<Hall> list = new ArrayList<>();
@@ -26,7 +26,7 @@ public class HallRepository {
     }
 
     public Hall getHallById(int id) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Halls WHERE HallId = ?");
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -41,7 +41,7 @@ public class HallRepository {
     }
 
     public Hall addHall(Hall hall) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO Halls(HallName, SalePointId, IsActive) VALUES (?,?,?)""", Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, hall.getHallName());
@@ -58,7 +58,7 @@ public class HallRepository {
     }
 
     public void changeActiveStatus(int id, boolean status) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     UPDATE Halls SET IsActive=? WHERE HallId=?""");
             statement.setBoolean(1, status);
@@ -68,7 +68,7 @@ public class HallRepository {
     }
 
     public List<Hall> getHallsBySalePointId(int salePointId) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DBProperties.URL)) {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT Halls.HallId, Halls.HallName, Halls.SalePointId, Halls.IsActive FROM Halls
                         JOIN SalePoints ON Halls.SalePointId = SalePoints.SalePointId
