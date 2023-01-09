@@ -30,7 +30,7 @@ public class EmployeeInformationController {
             sectionOrHallLabel.setText("Зал: " + seller.getHall().getHallName());
         } catch (SQLException | NoSalePointByIdException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
-            ViewUtils.getStage(titleLabel).close();
+            // ViewUtils.getStage(titleLabel).close();
         }
     }
 
@@ -41,7 +41,7 @@ public class EmployeeInformationController {
             sectionOrHallLabel.setText("Секция: " + superVisor.getSection().getSectionName());
         } catch (SQLException | NoSalePointByIdException exception) {
             new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
-            ViewUtils.getStage(titleLabel).close();
+            // ViewUtils.getStage(titleLabel).close();
         }
     }
 

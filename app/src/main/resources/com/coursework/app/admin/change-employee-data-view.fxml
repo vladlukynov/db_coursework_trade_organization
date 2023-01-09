@@ -22,6 +22,7 @@
             <TextField fx:id="loginField" promptText="Логин" />
             <PasswordField fx:id="passwordField" promptText="Пароль" />
             <TextField fx:id="nameField" promptText="ФИО" />
+            <TextField fx:id="salaryTextField" disable="true" promptText="Заработная плата" />
             <ComboBox fx:id="roleBox" onAction="#roleBoxChange" prefHeight="26.0" prefWidth="170.0" promptText="Роль" />
             <ComboBox fx:id="salePointBox" disable="true" onAction="#salePointChange" prefHeight="26.0" prefWidth="170.0" promptText="Торговая точка" />
             <HBox spacing="10.0">

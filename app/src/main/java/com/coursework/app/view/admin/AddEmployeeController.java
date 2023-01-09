@@ -20,7 +20,8 @@ public class AddEmployeeController {
 
     @FXML
     private PasswordField passwordField;
-
+    @FXML
+    private TextField salaryTextField;
     @FXML
     private ComboBox<Role> roleBox;
     @FXML
@@ -89,7 +90,19 @@ public class AddEmployeeController {
                     new Alert(Alert.AlertType.INFORMATION, "Зал не выбран", ButtonType.OK).showAndWait();
                     return;
                 }
-                userService.addSeller(new Seller(login, password, name[1], name[0], name[2], role, true, hall));
+                double salary;
+                try {
+                    salary = Double.parseDouble(salaryTextField.getText().trim());
+                } catch (NumberFormatException exception) {
+                    new Alert(Alert.AlertType.INFORMATION, "Заработная плата должна быть числом", ButtonType.OK).showAndWait();
+                    return;
+                }
+                if (salary < 0) {
+                    new Alert(Alert.AlertType.INFORMATION, "Заработная плата должна быть больше 0", ButtonType.OK).showAndWait();
+                    return;
+                }
+
+                userService.addSeller(new Seller(login, password, name[1], name[0], name[2], role, true, hall, salary));
             } else {
                 userService.addUser(new User(login, password, name[1], name[0], name[2], role, true));
             }
@@ -114,14 +127,17 @@ public class AddEmployeeController {
             salePointBox.setDisable(false);
             sectionBox.setDisable(false);
             hallBox.setDisable(true);
+            salaryTextField.setDisable(true);
         } else if (role.getRoleName().equals("Продавец")) {
             salePointBox.setDisable(false);
             sectionBox.setDisable(true);
             hallBox.setDisable(false);
+            salaryTextField.setDisable(false);
         } else {
             salePointBox.setDisable(true);
             sectionBox.setDisable(true);
             hallBox.setDisable(true);
+            salaryTextField.setDisable(true);
         }
     }
 

@@ -35,7 +35,7 @@ public class UserRepository {
     public List<Seller> getSellers() throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
-                    SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, Sellers.HallId FROM Sellers
+                    SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, Sellers.HallId, Sellers.Salary FROM Sellers
                         JOIN Users ON Sellers.UserLogin = Users.UserLogin""");
             ResultSet resultSet = statement.executeQuery();
             List<Seller> list = new ArrayList<>();
@@ -47,7 +47,8 @@ public class UserRepository {
                         resultSet.getString("MiddleName"),
                         roleRepository.getRoleById(resultSet.getInt("RoleId")),
                         resultSet.getBoolean("IsActive"),
-                        hallRepository.getHallById(resultSet.getInt("HallId"))));
+                        hallRepository.getHallById(resultSet.getInt("HallId")),
+                        resultSet.getDouble("Salary")));
             }
             return list;
         }
@@ -95,7 +96,7 @@ public class UserRepository {
     public Seller getSellerByLogin(String login) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
-                    SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, Sellers.HallId FROM Sellers
+                    SELECT Users.UserLogin, Users.Password, Users.FirstName, Users.LastName, Users.MiddleName, Users.RoleId, Users.IsActive, Sellers.HallId, Sellers.Salary FROM Sellers
                         JOIN Users ON Sellers.UserLogin = Users.UserLogin
                     WHERE Sellers.UserLogin = ?""");
             statement.setString(1, login);
@@ -108,7 +109,8 @@ public class UserRepository {
                         resultSet.getString("MiddleName"),
                         roleRepository.getRoleById(resultSet.getInt("RoleId")),
                         resultSet.getBoolean("IsActive"),
-                        hallRepository.getHallById(resultSet.getInt("HallId")));
+                        hallRepository.getHallById(resultSet.getInt("HallId")),
+                        resultSet.getDouble("Salary"));
             }
             return null;
         }
@@ -173,9 +175,10 @@ public class UserRepository {
         addUser(seller);
         try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
-                    INSERT INTO Sellers(UserLogin, HallId) VALUES (?,?)""");
+                    INSERT INTO Sellers(UserLogin, HallId, Salary) VALUES (?,?,?)""");
             statement.setString(1, seller.getUserLogin());
             statement.setInt(2, seller.getHall().getHallId());
+            statement.setDouble(3, seller.getSalary());
             statement.execute();
 
             return seller;
@@ -231,7 +234,17 @@ public class UserRepository {
 
     public boolean isSeller(String login) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
-            PreparedStatement statement = connection.prepareStatement("SELECT EXISTS(SELECT * FROM Sellers WHERE UserLogin=?)");
+            PreparedStatement statement = connection.prepareStatement("""
+                    IF EXISTS(SELECT *
+                              FROM Sellers
+                              WHERE UserLogin = ?)
+                        BEGIN
+                            SELECT 1
+                        END
+                    ELSE
+                        BEGIN
+                            SELECT 0
+                        END""");
             statement.setString(1, login);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -243,7 +256,17 @@ public class UserRepository {
 
     public boolean isSuperVisor(String login) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
-            PreparedStatement statement = connection.prepareStatement("SELECT EXISTS(SELECT * FROM SuperVisors WHERE UserLogin=?)");
+            PreparedStatement statement = connection.prepareStatement("""
+                    IF EXISTS(SELECT *
+                              FROM SuperVisors
+                              WHERE UserLogin = ?)
+                        BEGIN
+                            SELECT 1
+                        END
+                    ELSE
+                        BEGIN
+                            SELECT 0
+                        END""");
             statement.setString(1, login);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {

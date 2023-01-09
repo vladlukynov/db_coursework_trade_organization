@@ -25,7 +25,8 @@ public class ChangeEmployeeDataController {
 
     @FXML
     private PasswordField passwordField;
-
+    @FXML
+    private TextField salaryTextField;
     @FXML
     private ComboBox<Role> roleBox;
 
@@ -88,6 +89,9 @@ public class ChangeEmployeeDataController {
                         hallBox.getItems().stream().filter(item -> item.getHallId() ==
                                 hall_.getHallId()).findFirst().orElse(null));
                 hallBox.setDisable(false);
+
+                salaryTextField.setText(String.valueOf(userService.getSellerByLogin(user.getUserLogin()).getSalary()));
+                salaryTextField.setDisable(false);
             }
 
             loginField.setText(user.getUserLogin());
@@ -140,7 +144,18 @@ public class ChangeEmployeeDataController {
                     new Alert(Alert.AlertType.INFORMATION, "Зал не выбран", ButtonType.OK).showAndWait();
                     return;
                 }
-                userService.updateSeller(new Seller(login, password, name[1], name[0], name[2], role, user.getIsActive(), hall),
+                double salary;
+                try {
+                    salary = Double.parseDouble(salaryTextField.getText().trim());
+                } catch (NumberFormatException exception) {
+                    new Alert(Alert.AlertType.INFORMATION, "Заработная плата должна быть числом", ButtonType.OK).showAndWait();
+                    return;
+                }
+                if (salary < 0) {
+                    new Alert(Alert.AlertType.INFORMATION, "Заработная плата должна быть больше 0", ButtonType.OK).showAndWait();
+                    return;
+                }
+                userService.updateSeller(new Seller(login, password, name[1], name[0], name[2], role, user.getIsActive(), hall, salary),
                         user.getUserLogin());
             } else {
                 userService.updateUser(new User(login, password, name[1], name[0], name[2], role, user.getIsActive()),
@@ -167,14 +182,17 @@ public class ChangeEmployeeDataController {
             salePointBox.setDisable(false);
             sectionBox.setDisable(false);
             hallBox.setDisable(true);
+            salaryTextField.setDisable(true);
         } else if (role.getRoleName().equals("Продавец")) {
             salePointBox.setDisable(false);
             sectionBox.setDisable(true);
             hallBox.setDisable(false);
+            salaryTextField.setDisable(false);
         } else {
             salePointBox.setDisable(true);
             sectionBox.setDisable(true);
             hallBox.setDisable(true);
+            salaryTextField.setDisable(true);
         }
     }
 
