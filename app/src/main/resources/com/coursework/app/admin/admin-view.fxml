@@ -8,11 +8,13 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="482.0" prefWidth="797.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coursework.app.view.admin.AdminController">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1050.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coursework.app.view.admin.AdminController">
   <tabs>
     <Tab fx:id="employeeTab" onSelectionChanged="#employeeTabSelected" text="Сотрудники">
          <content>
@@ -222,6 +224,53 @@
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
             </VBox>
+        </content>
+      </Tab>
+      <Tab fx:id="consumersWorkTab" text="Работа с покупателями">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+        </content>
+      </Tab>
+      <Tab fx:id="salePointsWorkTab" text="Работа с торг. точками">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+        </content>
+      </Tab>
+      <Tab fx:id="sellersWorkTab" text="Работа с продавцами">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="616.0" prefWidth="1150.0" />
+        </content>
+      </Tab>
+      <Tab fx:id="suppliersWorkTab" onSelectionChanged="#suppliersWorkTabSelected" text="Работа с поставщиками">
+        <content>
+            <HBox alignment="CENTER">
+               <children>
+                  <VBox alignment="CENTER_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <HBox alignment="TOP_RIGHT" spacing="10.0">
+                           <children>
+                              <ComboBox fx:id="productsForSuppliersBox" prefWidth="150.0" promptText="Вид товара" />
+                              <Button mnemonicParsing="false" onAction="#getSuppliersByProductButtonClick" text="Получить" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="TOP_RIGHT" spacing="10.0">
+                           <children>
+                              <TextField fx:id="orderIdTextField" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="168.0" promptText="Номер заказа" />
+                              <Button mnemonicParsing="false" onAction="#getSuppliersByOrderButtonClick" text="Получить" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+                  <VBox fx:id="suppliersWorkTableLayout" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </HBox>
         </content>
       </Tab>
   </tabs>

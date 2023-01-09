@@ -2,8 +2,8 @@
 -- либо некоторый товар в объеме, не менее заданного за весь период сотрудничества,
 -- либо за указанный период.
 
--- Перечень и общее число поставщиков, поставляющих указанный вид товара за весь период сотрудничества
-SELECT SupplierName, COUNT(*) as suppliersCount
+-- Получить перечень и общее число поставщиков, поставляющих указанный вид товара за весь период сотрудничества
+SELECT SupplierName, COUNT(*) as SuppliersCount
 FROM SuppliersProducts
          JOIN Suppliers ON SuppliersProducts.SupplierId = Suppliers.SupplierId
 WHERE ProductId = 4
@@ -318,7 +318,7 @@ FROM (SELECT SUM(TransactionsProducts.Quantity * Price * (1 - Discount / 100)) a
                JOIN SalePoints ON ProductsSalePoints.SalePointId = SalePoints.SalePointId
                JOIN SalePointTypes ON SalePoints.TypeId = SalePointTypes.TypeId
       WHERE SalePoints.SalePointId = 3) as SumTable,
-    TransactionsProducts
+     TransactionsProducts
          JOIN Products ON TransactionsProducts.ProductId = Products.ProductId
          JOIN ProductsSalePoints ON Products.ProductId = ProductsSalePoints.ProductId
          JOIN SalePoints ON ProductsSalePoints.SalePointId = SalePoints.SalePointId

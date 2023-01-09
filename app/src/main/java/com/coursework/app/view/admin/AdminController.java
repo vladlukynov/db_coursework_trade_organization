@@ -2,6 +2,8 @@ package com.coursework.app.view.admin;
 
 import com.coursework.app.TradeOrganizationApp;
 import com.coursework.app.entity.*;
+import com.coursework.app.entity.queries.SuppliersByOrder;
+import com.coursework.app.entity.queries.SuppliersByProduct;
 import com.coursework.app.exception.NoUserByLoginException;
 import com.coursework.app.service.*;
 import com.coursework.app.utils.StringConverterUtils;
@@ -15,10 +17,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 public class AdminController {
     private boolean isInitialized = false;
@@ -200,6 +204,9 @@ public class AdminController {
         sectionSalePointBox.setItems(sectionSalePointBoxItems);
         sectionSalePointBox.setConverter(StringConverterUtils.salePointNameStringConverter);
         sectionSalePointBox.setOnAction(event -> updateSectionHallBox());
+
+        /* *********** ПОСТАВЩИКИ *********** */
+        productsForSuppliersBox.setConverter(StringConverterUtils.productNameStringConverter);
 
         ViewControllers.setAdminController(this);
         isInitialized = true;
@@ -654,5 +661,113 @@ public class AdminController {
 
     protected User getSelectedEmployee() {
         return employeeTable.getSelectionModel().getSelectedItem();
+    }
+
+    @FXML
+    private Tab consumersWorkTab;
+    @FXML
+    private Tab salePointsWorkTab;
+    @FXML
+    private Tab sellersWorkTab;
+
+
+    /* ********************** ПОСТАВЩИКИ ********************** */
+    @FXML
+    private Tab suppliersWorkTab;
+    @FXML
+    private TextField orderIdTextField;
+    @FXML
+    private ComboBox<Product> productsForSuppliersBox;
+    @FXML
+    private VBox suppliersWorkTableLayout;
+
+    @FXML
+    protected void getSuppliersByProductButtonClick() {
+        if (productsForSuppliersBox.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Товар не выбран", ButtonType.OK).showAndWait();
+            return;
+        }
+        suppliersWorkTableLayout.getChildren().clear();
+
+        TableView<SuppliersByProduct> table = new TableView<>();
+        Label label = new Label();
+
+        TableColumn<SuppliersByProduct, String> nameColumn = new TableColumn<>();
+        nameColumn.setText("Наименование поставщика");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("SupplierName"));
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.getColumns().add(nameColumn);
+
+        try {
+            List<SuppliersByProduct> list = supplierService.getSuppliersByProduct(productsForSuppliersBox.getSelectionModel().getSelectedItem());
+            table.getItems().addAll(list);
+
+            label.setText("Количество поставщиков: " + list.size());
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+
+        suppliersWorkTableLayout.getChildren().add(table);
+        suppliersWorkTableLayout.getChildren().add(label);
+    }
+
+    @FXML
+    protected void getSuppliersByOrderButtonClick() {
+        int orderId;
+        try {
+            orderId = Integer.parseInt(orderIdTextField.getText().trim());
+        } catch (NumberFormatException exception) {
+            new Alert(Alert.AlertType.INFORMATION, "Номер заказа должен быть целым числом", ButtonType.OK).showAndWait();
+            return;
+        }
+        if (orderId <= 0) {
+            new Alert(Alert.AlertType.INFORMATION, "Номер заказа должен быть больше 0", ButtonType.OK).showAndWait();
+            return;
+        }
+        suppliersWorkTableLayout.getChildren().clear();
+
+        TableView<SuppliersByOrder> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<SuppliersByOrder, String> salePointName = new TableColumn<>();
+        TableColumn<SuppliersByOrder, String> typeName = new TableColumn<>();
+        TableColumn<SuppliersByOrder, String> productName = new TableColumn<>();
+        TableColumn<SuppliersByOrder, Integer> quantity = new TableColumn<>();
+        TableColumn<SuppliersByOrder, Double> price = new TableColumn<>();
+
+        salePointName.setText("Торговая точка");
+        typeName.setText("Тип торговой точки");
+        productName.setText("Наименование товара");
+        quantity.setText("Количество");
+        price.setText("Стоимость");
+
+        salePointName.setCellValueFactory(new PropertyValueFactory<>("salePointName"));
+        typeName.setCellValueFactory(new PropertyValueFactory<>("typeName"));
+        productName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        price.setCellValueFactory(new PropertyValueFactory<>("price"));
+
+        table.getColumns().addAll(List.of(salePointName, typeName, productName, quantity, price));
+        suppliersWorkTableLayout.getChildren().add(table);
+
+        try {
+            table.getItems().addAll(supplierService.getSuppliersByOrder(orderId));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    @FXML
+    protected void suppliersWorkTabSelected() {
+        if (suppliersWorkTab.isSelected()) {
+            suppliersWorkTableLayout.getChildren().clear();
+            productsForSuppliersBox.getItems().clear();
+            try {
+                productsForSuppliersBox.getItems().addAll(productService.getProducts());
+            } catch (SQLException exception) {
+                new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            }
+        }
     }
 }

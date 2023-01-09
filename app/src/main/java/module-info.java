@@ -13,6 +13,7 @@ module com.coursework.app {
 
     exports com.coursework.app;
     exports com.coursework.app.entity;
+    exports com.coursework.app.entity.queries;
     exports com.coursework.app.exception;
     exports com.coursework.app.repository;
     exports com.coursework.app.service;

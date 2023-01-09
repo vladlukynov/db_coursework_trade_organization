@@ -1,7 +1,10 @@
 package com.coursework.app.repository;
 
+import com.coursework.app.entity.Product;
 import com.coursework.app.entity.Supplier;
 import com.coursework.app.entity.SupplierProduct;
+import com.coursework.app.entity.queries.SuppliersByOrder;
+import com.coursework.app.entity.queries.SuppliersByProduct;
 import com.coursework.app.utils.DBProperties;
 
 import java.sql.*;
@@ -105,6 +108,52 @@ public class SupplierRepository {
 
             return new SupplierProduct(getSupplierById(supplierId),
                     productRepository.getProductById(productId), price, true);
+        }
+    }
+
+    /* ************** ЗАПРОСЫ ************** */
+    public List<SuppliersByProduct> getSuppliersByProduct(Product product) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT SupplierName, COUNT(*) as suppliersCount
+                    FROM SuppliersProducts
+                             JOIN Suppliers ON SuppliersProducts.SupplierId = Suppliers.SupplierId
+                    WHERE ProductId = ?
+                    GROUP BY SupplierName""");
+            statement.setInt(1, product.getProductId());
+            ResultSet resultSet = statement.executeQuery();
+            List<SuppliersByProduct> list = new ArrayList<>();
+            while (resultSet.next()) {
+                list.add(new SuppliersByProduct(resultSet.getString("SupplierName"),
+                        resultSet.getInt("SuppliersCount")));
+            }
+            return list;
+        }
+    }
+
+    public List<SuppliersByOrder> getSuppliersByOrder(int orderId) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT SalePointName, TypeName, ProductName, Quantity, Price
+                    FROM SuppliersRequests
+                             JOIN Suppliers ON SuppliersRequests.SupplierId = Suppliers.SupplierId
+                             JOIN Products ON SuppliersRequests.ProductId = Products.ProductId
+                             JOIN Requests ON SuppliersRequests.RequestId = Requests.RequestId
+                             JOIN SuppliersProducts ON Products.ProductId = SuppliersProducts.ProductId
+                             JOIN SalePoints ON Requests.SalePointId = SalePoints.SalePointId
+                             JOIN SalePointTypes ON SalePoints.TypeId = SalePointTypes.TypeId
+                    WHERE SuppliersRequests.RequestId = ?""");
+            statement.setInt(1, orderId);
+            ResultSet resultSet = statement.executeQuery();
+            List<SuppliersByOrder> list = new ArrayList<>();
+            while (resultSet.next()) {
+                list.add(new SuppliersByOrder(resultSet.getString("SalePointName"),
+                        resultSet.getString("TypeName"),
+                        resultSet.getString("ProductName"),
+                        resultSet.getInt("Quantity"),
+                        resultSet.getDouble("Price")));
+            }
+            return list;
         }
     }
 }

@@ -1,7 +1,10 @@
 package com.coursework.app.service;
 
+import com.coursework.app.entity.Product;
 import com.coursework.app.entity.Supplier;
 import com.coursework.app.entity.SupplierProduct;
+import com.coursework.app.entity.queries.SuppliersByOrder;
+import com.coursework.app.entity.queries.SuppliersByProduct;
 import com.coursework.app.exception.AddSupplierException;
 import com.coursework.app.exception.NoSupplierByIdException;
 import com.coursework.app.repository.SupplierRepository;
@@ -46,5 +49,14 @@ public class SupplierService {
 
     public SupplierProduct addSupplierProduct(int supplierId, int productId, double price) throws SQLException {
         return supplierRepository.addSupplierProduct(supplierId, productId, price);
+    }
+
+    /* ************** ЗАПРОСЫ ************** */
+    public List<SuppliersByProduct> getSuppliersByProduct(Product product) throws SQLException {
+        return supplierRepository.getSuppliersByProduct(product);
+    }
+
+    public List<SuppliersByOrder> getSuppliersByOrder(int orderId) throws SQLException {
+        return supplierRepository.getSuppliersByOrder(orderId);
     }
 }
