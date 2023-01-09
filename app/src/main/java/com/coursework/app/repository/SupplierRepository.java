@@ -112,6 +112,8 @@ public class SupplierRepository {
     }
 
     /* ************** ЗАПРОСЫ ************** */
+
+    // Получить перечень и общее число поставщиков, поставляющих указанный вид товара за весь период сотрудничества
     public List<SuppliersByProduct> getSuppliersByProduct(Product product) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
@@ -131,6 +133,7 @@ public class SupplierRepository {
         }
     }
 
+    // Получить сведения о поставках товаров по указанному номеру заказа.
     public List<SuppliersByOrder> getSuppliersByOrder(int orderId) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""

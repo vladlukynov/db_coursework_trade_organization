@@ -201,7 +201,7 @@ WHERE ProductName = N'Кефир';
 -- по заданной торговой точке.
 
 -- Получить данные об отношении объема продаж к объему торговых площадей по торговым точкам указанного типа
-SELECT Table1.ProductsSum / Table2.PointSize
+SELECT (Table1.ProductsSum / Table2.PointSize) AS Relation
 FROM (SELECT SUM(TransactionsProducts.Quantity * Price * (1 - Discount / 100)) as ProductsSum
       FROM (SELECT TransactionId, TypeName
             FROM SalePoints

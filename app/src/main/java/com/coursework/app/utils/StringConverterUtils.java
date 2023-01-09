@@ -3,6 +3,7 @@ package com.coursework.app.utils;
 import com.coursework.app.entity.*;
 import javafx.util.StringConverter;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -123,6 +124,31 @@ public class StringConverterUtils {
 
         @Override
         public Double fromString(String s) {
+            return null;
+        }
+    };
+
+    public static StringConverter<Double> moneyStringConverter = new StringConverter<>() {
+        @Override
+        public String toString(Double aDouble) {
+            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+            return decimalFormat.format(aDouble) + "₽";
+        }
+
+        @Override
+        public Double fromString(String s) {
+            return null;
+        }
+    };
+
+    public static StringConverter<Seller> sellerNameStringConverter = new StringConverter<>() {
+        @Override
+        public String toString(Seller seller) {
+            return seller.getLastName() + " " + seller.getFirstName() + " " + seller.getMiddleName();
+        }
+
+        @Override
+        public Seller fromString(String s) {
             return null;
         }
     };

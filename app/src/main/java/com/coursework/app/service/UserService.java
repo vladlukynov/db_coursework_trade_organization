@@ -3,6 +3,8 @@ package com.coursework.app.service;
 import com.coursework.app.entity.Seller;
 import com.coursework.app.entity.SuperVisor;
 import com.coursework.app.entity.User;
+import com.coursework.app.entity.queries.SalePointsSellers;
+import com.coursework.app.exception.GetDBInformationException;
 import com.coursework.app.exception.NoUserByLoginException;
 import com.coursework.app.repository.UserRepository;
 
@@ -74,5 +76,26 @@ public class UserService {
 
     public boolean isSuperVisor(String login) throws SQLException {
         return userRepository.isSuperVisor(login);
+    }
+
+    /* ******************* Продавцы ******************* */
+    public List<SalePointsSellers> getAllSalePointsSellers() throws SQLException {
+        return userRepository.getAllSalePointsSellers();
+    }
+
+    public List<SalePointsSellers> getSalePointSellers(String salePointTypeName) throws SQLException {
+        return userRepository.getSalePointSellers(salePointTypeName);
+    }
+
+    public SalePointsSellers getSalePointSeller(String login) throws SQLException, GetDBInformationException {
+        SalePointsSellers result = userRepository.getSalePointSeller(login);
+        if (result == null) {
+            throw new GetDBInformationException("Выработка по данному продавцу отсутствует в базе данных");
+        }
+        return result;
+    }
+
+    public double getRelation(String typeName) throws SQLException {
+        return userRepository.getRelation(typeName);
     }
 }

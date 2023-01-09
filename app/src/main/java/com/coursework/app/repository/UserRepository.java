@@ -3,6 +3,7 @@ package com.coursework.app.repository;
 import com.coursework.app.entity.Seller;
 import com.coursework.app.entity.SuperVisor;
 import com.coursework.app.entity.User;
+import com.coursework.app.entity.queries.SalePointsSellers;
 import com.coursework.app.utils.DBProperties;
 
 import java.sql.*;
@@ -273,6 +274,134 @@ public class UserRepository {
                 return resultSet.getBoolean(1);
             }
             return false;
+        }
+    }
+
+    /* ******************* Продавцы ******************* */
+
+    // Получить данные о выработке на одного продавца за указанный период по всем торговым точкам
+    public List<SalePointsSellers> getAllSalePointsSellers() throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT SellerLogin, FirstName, LastName, MiddleName, SalePointName, TypeName, Total
+                    FROM (SELECT SellerLogin, SUM(TransactionsProducts.Quantity * Price * (1 - Discount / 100)) as Total
+                          FROM Transactions
+                                   JOIN TransactionsProducts ON Transactions.TransactionId = TransactionsProducts.TransactionId
+                                   JOIN ProductsSalePoints ON TransactionsProducts.ProductId = ProductsSalePoints.ProductId
+                                   JOIN SalePoints ON ProductsSalePoints.SalePointId = SalePoints.SalePointId
+                                   JOIN Users ON UserLogin = SellerLogin
+                          GROUP BY SellerLogin) as totalTable
+                             JOIN Users ON SellerLogin = UserLogin
+                             JOIN Sellers ON Users.UserLogin = Sellers.UserLogin
+                             JOIN Halls ON Sellers.HallId = Halls.HallId
+                             JOIN SalePoints ON Halls.SalePointId = SalePoints.SalePointId
+                             JOIN SalePointTypes ON SalePoints.TypeId = SalePointTypes.TypeId""");
+            ResultSet resultSet = statement.executeQuery();
+            List<SalePointsSellers> list = new ArrayList<>();
+            while (resultSet.next()) {
+                list.add(new SalePointsSellers(resultSet.getString("SellerLogin"),
+                        resultSet.getString("FirstName"),
+                        resultSet.getString("LastName"),
+                        resultSet.getString("MiddleName"),
+                        resultSet.getString("SalePointName"),
+                        resultSet.getString("TypeName"),
+                        resultSet.getDouble("Total")));
+            }
+            return list;
+        }
+    }
+
+    // Получить данные о выработке на одного продавца за указанный период по торговым точкам
+    // заданного типа
+    public List<SalePointsSellers> getSalePointSellers(String salePointTypeName) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT SellerLogin, FirstName, LastName, MiddleName, SalePointName, TypeName, Total
+                    FROM (SELECT SellerLogin, SUM(TransactionsProducts.Quantity * Price * (1 - Discount / 100)) as Total
+                          FROM Transactions
+                                   JOIN TransactionsProducts ON Transactions.TransactionId = TransactionsProducts.TransactionId
+                                   JOIN ProductsSalePoints ON TransactionsProducts.ProductId = ProductsSalePoints.ProductId
+                                   JOIN SalePoints ON ProductsSalePoints.SalePointId = SalePoints.SalePointId
+                                   JOIN Users ON UserLogin = SellerLogin
+                          GROUP BY SellerLogin) as totalTable
+                             JOIN Users ON SellerLogin = UserLogin
+                             JOIN Sellers ON Users.UserLogin = Sellers.UserLogin
+                             JOIN Halls ON Sellers.HallId = Halls.HallId
+                             JOIN SalePoints ON Halls.SalePointId = SalePoints.SalePointId
+                             JOIN SalePointTypes ON SalePoints.TypeId = SalePointTypes.TypeId
+                    WHERE TypeName = ?""");
+            statement.setString(1, salePointTypeName);
+            ResultSet resultSet = statement.executeQuery();
+
+            List<SalePointsSellers> list = new ArrayList<>();
+            while (resultSet.next()) {
+                list.add(new SalePointsSellers(resultSet.getString("SellerLogin"),
+                        resultSet.getString("FirstName"),
+                        resultSet.getString("LastName"),
+                        resultSet.getString("MiddleName"),
+                        resultSet.getString("SalePointName"),
+                        resultSet.getString("TypeName"),
+                        resultSet.getDouble("Total")));
+            }
+            return list;
+        }
+    }
+
+    // Получить данные о выработке отдельно взятого продавца отдельно взятой торговой точки за указанный период.
+    public SalePointsSellers getSalePointSeller(String login) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT SellerLogin, FirstName, LastName, MiddleName, SalePointName, TypeName, Total
+                    FROM (SELECT SellerLogin, SUM(TransactionsProducts.Quantity * Price * (1 - Discount / 100)) as Total
+                          FROM Transactions
+                                   JOIN TransactionsProducts ON Transactions.TransactionId = TransactionsProducts.TransactionId
+                                   JOIN ProductsSalePoints ON TransactionsProducts.ProductId = ProductsSalePoints.ProductId
+                                   JOIN SalePoints ON ProductsSalePoints.SalePointId = SalePoints.SalePointId
+                                   JOIN Users ON UserLogin = SellerLogin
+                          GROUP BY SellerLogin) as totalTable
+                             JOIN Users ON SellerLogin = UserLogin
+                             JOIN Sellers ON Users.UserLogin = Sellers.UserLogin
+                             JOIN Halls ON Sellers.HallId = Halls.HallId
+                             JOIN SalePoints ON Halls.SalePointId = SalePoints.SalePointId
+                             JOIN SalePointTypes ON SalePoints.TypeId = SalePointTypes.TypeId
+                    WHERE SellerLogin = ?""");
+            statement.setString(1, login);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next() ? new SalePointsSellers(resultSet.getString("SellerLogin"),
+                    resultSet.getString("FirstName"),
+                    resultSet.getString("LastName"),
+                    resultSet.getString("MiddleName"),
+                    resultSet.getString("SalePointName"),
+                    resultSet.getString("TypeName"),
+                    resultSet.getDouble("Total")) : null;
+        }
+    }
+
+    // Получить данные об отношении объема продаж к объему торговых площадей по торговым точкам указанного типа
+    public double getRelation(String typeName) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT (Table1.ProductsSum / Table2.PointSize) AS Relation
+                    FROM (SELECT SUM(TransactionsProducts.Quantity * Price * (1 - Discount / 100)) as ProductsSum
+                          FROM (SELECT TransactionId, TypeName
+                                FROM SalePoints
+                                         JOIN SalePointTypes ON SalePoints.TypeId = SalePointTypes.TypeId
+                                         JOIN Halls ON SalePoints.SalePointId = Halls.SalePointId
+                                         JOIN Sellers ON Halls.HallId = Sellers.HallId
+                                         JOIN Transactions ON Sellers.UserLogin = Transactions.SellerLogin) as Transactions
+                                   JOIN TransactionsProducts ON Transactions.TransactionId = TransactionsProducts.TransactionId
+                                   JOIN ProductsSalePoints ON ProductsSalePoints.ProductId = TransactionsProducts.ProductId
+                                   JOIN Products ON TransactionsProducts.ProductId = Products.ProductId
+                          WHERE TypeName = ?
+                          GROUP BY TypeName) as Table1,
+                         (SELECT SUM(PointSize) as PointSize
+                          FROM SalePoints
+                                   JOIN SalePointTypes ON SalePoints.TypeId = SalePointTypes.TypeId
+                          WHERE TypeName = ?) as Table2""");
+            statement.setString(1, typeName);
+            statement.setString(2, typeName);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next() ? resultSet.getDouble("Relation") : 0.0;
         }
     }
 }
