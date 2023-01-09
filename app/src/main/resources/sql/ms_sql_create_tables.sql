@@ -77,7 +77,8 @@ CREATE TABLE SuperVisors
 CREATE TABLE Sellers
 (
     UserLogin VARCHAR(64) NOT NULL UNIQUE FOREIGN KEY REFERENCES Users (UserLogin),
-    HallId    INTEGER     NOT NULL FOREIGN KEY REFERENCES Halls (HallId)
+    HallId    INTEGER     NOT NULL FOREIGN KEY REFERENCES Halls (HallId),
+    Salary    MONEY       NOT NULL CHECK (Salary >= 0)
 );
 
 -- Таблица продаж
