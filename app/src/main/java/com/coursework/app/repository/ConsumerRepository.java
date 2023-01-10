@@ -8,6 +8,7 @@ import com.coursework.app.entity.queries.ConsumerProductInfo;
 import com.coursework.app.utils.DBProperties;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -191,7 +192,7 @@ public class ConsumerRepository {
                         resultSet.getString("FirstName"),
                         resultSet.getString("LastName"),
                         resultSet.getString("MiddleName"),
-                        resultSet.getDate("TransactionDate")));
+                        LocalDate.parse(resultSet.getString("TransactionDate"))));
             }
             return list;
         }
@@ -222,7 +223,7 @@ public class ConsumerRepository {
                         resultSet.getString("FirstName"),
                         resultSet.getString("LastName"),
                         resultSet.getString("MiddleName"),
-                        resultSet.getDate("TransactionDate")));
+                        LocalDate.parse(resultSet.getString("TransactionDate"))));
             }
             return list;
         }
@@ -253,7 +254,7 @@ public class ConsumerRepository {
                         resultSet.getString("FirstName"),
                         resultSet.getString("LastName"),
                         resultSet.getString("MiddleName"),
-                        resultSet.getDate("TransactionDate")));
+                        LocalDate.parse(resultSet.getString("TransactionDate"))));
             }
             return list;
         }

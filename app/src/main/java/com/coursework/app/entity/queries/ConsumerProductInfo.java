@@ -1,5 +1,6 @@
 package com.coursework.app.entity.queries;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class ConsumerProductInfo {
@@ -8,9 +9,9 @@ public class ConsumerProductInfo {
     private final String firstName;
     private final String lastName;
     private final String middleName;
-    private final Date transactionDate;
+    private final LocalDate transactionDate;
 
-    public ConsumerProductInfo(String salePointName, String typeName, String firstName, String lastName, String middleName, Date transactionDate) {
+    public ConsumerProductInfo(String salePointName, String typeName, String firstName, String lastName, String middleName, LocalDate transactionDate) {
         this.salePointName = salePointName;
         this.typeName = typeName;
         this.firstName = firstName;
@@ -39,7 +40,7 @@ public class ConsumerProductInfo {
         return middleName;
     }
 
-    public Date getTransactionDate() {
+    public LocalDate getTransactionDate() {
         return transactionDate;
     }
 }
