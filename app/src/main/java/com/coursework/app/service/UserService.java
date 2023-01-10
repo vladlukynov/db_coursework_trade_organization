@@ -4,6 +4,7 @@ import com.coursework.app.entity.Seller;
 import com.coursework.app.entity.SuperVisor;
 import com.coursework.app.entity.User;
 import com.coursework.app.entity.queries.SalePointsSellers;
+import com.coursework.app.entity.queries.SellerSalary;
 import com.coursework.app.exception.GetDBInformationException;
 import com.coursework.app.exception.NoUserByLoginException;
 import com.coursework.app.repository.UserRepository;
@@ -78,7 +79,7 @@ public class UserService {
         return userRepository.isSuperVisor(login);
     }
 
-    /* ******************* Продавцы ******************* */
+    /* ******************* ЗАПРОСЫ ******************* */
     public List<SalePointsSellers> getAllSalePointsSellers() throws SQLException {
         return userRepository.getAllSalePointsSellers();
     }
@@ -97,5 +98,17 @@ public class UserService {
 
     public double getRelation(String typeName) throws SQLException {
         return userRepository.getRelation(typeName);
+    }
+
+    public List<SellerSalary> getSellersSalary() throws SQLException {
+        return userRepository.getSellersSalary();
+    }
+
+    public List<SellerSalary> getSellersSalaryBySalePointType(String typeName) throws SQLException {
+        return userRepository.getSellersSalaryBySalePointType(typeName);
+    }
+
+    public List<SellerSalary> getSellersSalaryBySalePointId(int salePointId) throws SQLException {
+        return userRepository.getSellersSalaryBySalePointId(salePointId);
     }
 }

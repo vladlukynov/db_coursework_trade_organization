@@ -2,11 +2,15 @@ package com.coursework.app.service;
 
 import com.coursework.app.entity.SalePoint;
 import com.coursework.app.entity.SalePointProduct;
+import com.coursework.app.entity.queries.Nomenclature;
+import com.coursework.app.entity.queries.SalePointByProduct;
+import com.coursework.app.entity.queries.SalesVolume;
+import com.coursework.app.entity.queries.TradeTurnover;
 import com.coursework.app.exception.AddSalePointException;
 import com.coursework.app.exception.NoSalePointByIdException;
 import com.coursework.app.repository.SalePointRepository;
 
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 public class SalePointService {
@@ -66,5 +70,42 @@ public class SalePointService {
             throw new NoSalePointByIdException("Не найдено торговых точек, где закреплен сотрудник " + login);
         }
         return salePoint;
+    }
+
+    /* **************** ЗАПРОСЫ **************** */
+    public List<Nomenclature> getNomenclature(int salePointId) throws SQLException {
+        return salePointRepository.getNomenclature(salePointId);
+    }
+
+    public double getProfitability(int salePointId) throws SQLException {
+        return salePointRepository.getProfitability(salePointId);
+    }
+
+    public List<SalePointByProduct> getSalePointsByProductName(String productName) throws SQLException {
+        return salePointRepository.getSalePointsByProductName(productName);
+    }
+
+    public List<SalePointByProduct> getSalePointsByProductNameAndTypeName(String productName, String typeName) throws SQLException {
+        return salePointRepository.getSalePointsByProductNameAndTypeName(productName, typeName);
+    }
+
+    public List<SalePointByProduct> getSalePointsByProductNameAndSalePointId(String productName, int salePointId) throws SQLException {
+        return salePointRepository.getSalePointsByProductNameAndSalePointId(productName, salePointId);
+    }
+
+    public List<TradeTurnover> getTradeTurnover(int salePointId) throws SQLException {
+        return salePointRepository.getTradeTurnover(salePointId);
+    }
+
+    public List<SalesVolume> getSalesVolumeByProductId(int productId) throws SQLException {
+        return salePointRepository.getSalesVolumeByProductId(productId);
+    }
+
+    public List<SalesVolume> getSalesVolumeByProductIdAndSalePointTypeName(int productId, String typeName) throws SQLException {
+        return salePointRepository.getSalesVolumeByProductIdAndSalePointTypeName(productId, typeName);
+    }
+
+    public List<SalesVolume> getSalesVolumeByProductIdAndSalePointId(int productId, int salePointId) throws SQLException {
+        return salePointRepository.getSalesVolumeByProductIdAndSalePointId(productId, salePointId);
     }
 }

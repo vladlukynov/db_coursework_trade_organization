@@ -1,6 +1,10 @@
 package com.coursework.app.service;
 
 import com.coursework.app.entity.Consumer;
+import com.coursework.app.entity.queries.ActiveConsumer;
+import com.coursework.app.entity.queries.ConsumerByProductName;
+import com.coursework.app.entity.queries.ConsumerProductInfo;
+import com.coursework.app.entity.queries.Deliveries;
 import com.coursework.app.exception.AddConsumerException;
 import com.coursework.app.exception.NoConsumerByIdException;
 import com.coursework.app.repository.ConsumerRepository;
@@ -33,5 +37,30 @@ public class ConsumerService {
             throw new AddConsumerException("Ошибка добавления покупателя в БД");
         }
         return consumer;
+    }
+
+    /* ******************* ЗАПРОСЫ ******************* */
+    public List<ConsumerByProductName> getConsumersByProductName(String productName) throws SQLException {
+        return consumerRepository.getConsumersByProductName(productName);
+    }
+
+    public List<ActiveConsumer> getActiveConsumers() throws SQLException {
+        return consumerRepository.getActiveConsumers();
+    }
+
+    public List<Deliveries> getDeliveriesByProductName(String productName) throws SQLException {
+        return consumerRepository.getDeliveriesByProductName(productName);
+    }
+
+    public List<ConsumerProductInfo> getConsumerProductInfo(String productName) throws SQLException {
+        return consumerRepository.getConsumerProductInfo(productName);
+    }
+
+    public List<ConsumerProductInfo> getConsumerProductInfoBySalePointTypeName(String productName, String typeName) throws SQLException {
+        return consumerRepository.getConsumerProductInfoBySalePointTypeName(productName, typeName);
+    }
+
+    public List<ConsumerProductInfo> getConsumerProductInfoBySalePointId(String productName, int salePointId) throws SQLException {
+        return consumerRepository.getConsumerProductInfoBySalePointId(productName, salePointId);
     }
 }

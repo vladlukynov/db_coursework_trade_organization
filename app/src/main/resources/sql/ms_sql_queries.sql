@@ -254,7 +254,7 @@ WHERE SuppliersRequests.RequestId = 1;
 -- 13. Получить сведения о покупателях указанного товара за обозначенный, либо за весь период,
 -- по всем торговым точкам, по торговым точкам указанного типа, по данной торговой точке.
 
--- Получить сведения о покупателях указанного товара за весь период по всем торговым точкам, по торговым точкам указанного типа, по данной торговой точке.
+-- Получить сведения о покупателях указанного товара за весь период по всем торговым точкам
 SELECT SalePointName, TypeName, FirstName, LastName, MiddleName, TransactionDate
 FROM Consumers
          JOIN Transactions ON Consumers.TransactionId = Transactions.TransactionId

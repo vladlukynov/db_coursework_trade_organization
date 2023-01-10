@@ -4,6 +4,7 @@ import com.coursework.app.entity.Seller;
 import com.coursework.app.entity.SuperVisor;
 import com.coursework.app.entity.User;
 import com.coursework.app.entity.queries.SalePointsSellers;
+import com.coursework.app.entity.queries.SellerSalary;
 import com.coursework.app.utils.DBProperties;
 
 import java.sql.*;
@@ -402,6 +403,82 @@ public class UserRepository {
             statement.setString(2, typeName);
             ResultSet resultSet = statement.executeQuery();
             return resultSet.next() ? resultSet.getDouble("Relation") : 0.0;
+        }
+    }
+
+    // Получить данные о заработной плате продавцов по всем торговым точкам
+    public List<SellerSalary> getSellersSalary() throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT SalePointName, TypeName, FirstName, LastName, MiddleName, Salary
+                    FROM Sellers
+                             JOIN Halls ON Sellers.HallId = Halls.HallId
+                             JOIN SalePoints ON Halls.SalePointId = SalePoints.SalePointId
+                             JOIN SalePointTypes ON SalePoints.TypeId = SalePointTypes.TypeId
+                             JOIN Users ON Sellers.UserLogin = Users.UserLogin""");
+            ResultSet resultSet = statement.executeQuery();
+            List<SellerSalary> list = new ArrayList<>();
+            while (resultSet.next()) {
+                list.add(new SellerSalary(resultSet.getString("SalePointName"),
+                        resultSet.getString("TypeName"),
+                        resultSet.getString("FirstName"),
+                        resultSet.getString("LastName"),
+                        resultSet.getString("MiddleName"),
+                        resultSet.getDouble("Salary")));
+            }
+            return list;
+        }
+    }
+
+    // Получить данные о заработной плате продавцов по торговым точкам заданного типа
+    public List<SellerSalary> getSellersSalaryBySalePointType(String typeName) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT SalePointName, TypeName, FirstName, LastName, MiddleName, Salary
+                    FROM Sellers
+                             JOIN Halls ON Sellers.HallId = Halls.HallId
+                             JOIN SalePoints ON Halls.SalePointId = SalePoints.SalePointId
+                             JOIN SalePointTypes ON SalePoints.TypeId = SalePointTypes.TypeId
+                             JOIN Users ON Sellers.UserLogin = Users.UserLogin
+                    WHERE TypeName = ?""");
+            statement.setString(1, typeName);
+            ResultSet resultSet = statement.executeQuery();
+            List<SellerSalary> list = new ArrayList<>();
+            while (resultSet.next()) {
+                list.add(new SellerSalary(resultSet.getString("SalePointName"),
+                        resultSet.getString("TypeName"),
+                        resultSet.getString("FirstName"),
+                        resultSet.getString("LastName"),
+                        resultSet.getString("MiddleName"),
+                        resultSet.getDouble("Salary")));
+            }
+            return list;
+        }
+    }
+
+    // Получить данные о заработной плате продавцов по конкретной торговой точке.
+    public List<SellerSalary> getSellersSalaryBySalePointId(int salePointId) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT SalePointName, TypeName, FirstName, LastName, MiddleName, Salary
+                    FROM Sellers
+                             JOIN Halls ON Sellers.HallId = Halls.HallId
+                             JOIN SalePoints ON Halls.SalePointId = SalePoints.SalePointId
+                             JOIN SalePointTypes ON SalePoints.TypeId = SalePointTypes.TypeId
+                             JOIN Users ON Sellers.UserLogin = Users.UserLogin
+                    WHERE SalePoints.SalePointId = ?""");
+            statement.setInt(1, salePointId);
+            ResultSet resultSet = statement.executeQuery();
+            List<SellerSalary> list = new ArrayList<>();
+            while (resultSet.next()) {
+                list.add(new SellerSalary(resultSet.getString("SalePointName"),
+                        resultSet.getString("TypeName"),
+                        resultSet.getString("FirstName"),
+                        resultSet.getString("LastName"),
+                        resultSet.getString("MiddleName"),
+                        resultSet.getDouble("Salary")));
+            }
+            return list;
         }
     }
 }
