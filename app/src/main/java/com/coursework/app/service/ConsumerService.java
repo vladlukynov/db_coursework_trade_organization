@@ -48,8 +48,8 @@ public class ConsumerService {
         return consumerRepository.getActiveConsumers();
     }
 
-    public List<Deliveries> getDeliveriesByProductName(String productName) throws SQLException {
-        return consumerRepository.getDeliveriesByProductName(productName);
+    public List<Deliveries> getDeliveriesByProductName(String productName, int supplierId) throws SQLException {
+        return consumerRepository.getDeliveriesByProductName(productName, supplierId);
     }
 
     public List<ConsumerProductInfo> getConsumerProductInfo(String productName) throws SQLException {

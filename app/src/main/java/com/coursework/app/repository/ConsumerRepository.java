@@ -140,7 +140,7 @@ public class ConsumerRepository {
     }
 
     // Получить сведения о поставках определенного товара указанным поставщиком за все время поставок
-    public List<Deliveries> getDeliveriesByProductName(String productName) throws SQLException {
+    public List<Deliveries> getDeliveriesByProductName(String productName, int supplierId) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DBProperties.URL, DBProperties.userName, DBProperties.password)) {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT Requests.RequestId, SalePointName, TypeName, ProductName, Quantity, Price
@@ -151,8 +151,9 @@ public class ConsumerRepository {
                              JOIN SuppliersProducts ON Products.ProductId = SuppliersProducts.ProductId
                              JOIN SalePoints ON Requests.SalePointId = SalePoints.SalePointId
                              JOIN SalePointTypes ON SalePoints.TypeId = SalePointTypes.TypeId
-                    WHERE ProductName = ?""");
+                    WHERE ProductName = ? AND Suppliers.SupplierId = ?""");
             statement.setString(1, productName);
+            statement.setInt(2, supplierId);
             ResultSet resultSet = statement.executeQuery();
             List<Deliveries> list = new ArrayList<>();
             while (resultSet.next()) {

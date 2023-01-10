@@ -2,9 +2,7 @@ package com.coursework.app.view.admin;
 
 import com.coursework.app.TradeOrganizationApp;
 import com.coursework.app.entity.*;
-import com.coursework.app.entity.queries.SalePointsSellers;
-import com.coursework.app.entity.queries.SuppliersByOrder;
-import com.coursework.app.entity.queries.SuppliersByProduct;
+import com.coursework.app.entity.queries.*;
 import com.coursework.app.exception.GetDBInformationException;
 import com.coursework.app.exception.NoUserByLoginException;
 import com.coursework.app.service.*;
@@ -142,6 +140,8 @@ public class AdminController {
     private final SectionService sectionService = new SectionService();
     private final SalePointTypeService salePointTypeService = new SalePointTypeService();
 
+    private final ConsumerService consumerService = new ConsumerService();
+
     @FXML
     protected void initialize() {
         // Инициализируем все TableView
@@ -209,10 +209,24 @@ public class AdminController {
         sectionSalePointBox.setConverter(StringConverterUtils.salePointNameStringConverter);
         sectionSalePointBox.setOnAction(event -> updateSectionHallBox());
 
+        /* *********** ПОКУПАТЕЛИ *********** */
+        productComboBox.setConverter(StringConverterUtils.productNameStringConverter);
+        /* *********** ТОРГОВЫЕ ТОЧКИ *********** */
+        salePointComboBox.setConverter(StringConverterUtils.salePointNameStringConverter);
+        salePointTypeComboBox.setConverter(StringConverterUtils.salePointTypeStringConverter);
+        salePointComboBox3.setConverter(StringConverterUtils.salePointNameStringConverter);
+        productComboBox2.setConverter(StringConverterUtils.productNameStringConverter);
+        productComboBox3.setConverter(StringConverterUtils.productNameStringConverter);
+        salePointTypeBox4.setConverter(StringConverterUtils.salePointTypeStringConverter);
+        salePointBox.setConverter(StringConverterUtils.salePointNameStringConverter);
+        productBox.setConverter(StringConverterUtils.productNameStringConverter);
+        supplierBox2.setConverter(StringConverterUtils.supplierNameStringConverter);
         /* *********** ПРОДАВЦЫ *********** */
         salePointTypeBox.setConverter(StringConverterUtils.salePointTypeStringConverter);
         salePointTypeBox2.setConverter(StringConverterUtils.salePointTypeStringConverter);
         sellersBox.setConverter(StringConverterUtils.sellerNameStringConverter);
+        salePointTypeBox3.setConverter(StringConverterUtils.salePointTypeStringConverter);
+        salePointBox2.setConverter(StringConverterUtils.salePointNameStringConverter);
         /* *********** ПОСТАВЩИКИ *********** */
         productsForSuppliersBox.setConverter(StringConverterUtils.productNameStringConverter);
 
@@ -671,10 +685,397 @@ public class AdminController {
         return employeeTable.getSelectionModel().getSelectedItem();
     }
 
+    /* *************** ПОКУПАТЕЛИ *************** */
     @FXML
     private Tab consumersWorkTab;
     @FXML
+    private ComboBox<Product> productComboBox;
+    @FXML
+    private VBox consumersTableLayout;
+
+    @FXML
+    protected void getConsumersByProduct() {
+        if (productComboBox.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите товар", ButtonType.OK).showAndWait();
+            return;
+        }
+        consumersTableLayout.getChildren().clear();
+        TableView<ConsumerByProductName> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<ConsumerByProductName, String> firstName = new TableColumn<>();
+        TableColumn<ConsumerByProductName, String> lastName = new TableColumn<>();
+        TableColumn<ConsumerByProductName, String> middleName = new TableColumn<>();
+
+        firstName.setText("Имя");
+        lastName.setText("Фамилиия");
+        middleName.setText("Отчество");
+
+        firstName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        lastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        middleName.setCellValueFactory(new PropertyValueFactory<>("middleName"));
+
+        table.getColumns().addAll(List.of(lastName, firstName, middleName));
+
+        Label label = new Label();
+        try {
+            List<ConsumerByProductName> list = consumerService.getConsumersByProductName(productComboBox.getSelectionModel().getSelectedItem().getProductName());
+            table.getItems().addAll(list);
+            label.setText("Общее число покупателей: " + list.size());
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+        consumersTableLayout.getChildren().add(table);
+        consumersTableLayout.getChildren().add(label);
+    }
+
+    @FXML
+    protected void consumersWorkTabSelected() {
+        if (consumersWorkTab.isSelected()) {
+            consumersTableLayout.getChildren().clear();
+            productComboBox.getItems().clear();
+
+            try {
+                productComboBox.getItems().addAll(productService.getProducts());
+            } catch (SQLException exception) {
+                new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            }
+        }
+    }
+
+    /* ***************** ТОРГОВЫЕ ТОЧКИ ***************** */
+    @FXML
     private Tab salePointsWorkTab;
+    @FXML
+    private ComboBox<SalePoint> salePointComboBox;
+    @FXML
+    private ComboBox<SalePoint> salePointComboBox3;
+    @FXML
+    private VBox salePointsTableLayout;
+    @FXML
+    private ComboBox<SalePoint> salePointBox;
+    @FXML
+    private ComboBox<SalePointType> salePointTypeComboBox;
+    @FXML
+    private ComboBox<Product> productComboBox2;
+    @FXML
+    private ComboBox<SalePointType> salePointTypeBox4;
+    @FXML
+    private ComboBox<Product> productComboBox3;
+    @FXML
+    private ComboBox<Product> productBox;
+    @FXML
+    private ComboBox<Supplier> supplierBox2;
+
+    @FXML
+    protected void getNomenclature() {
+        if (salePointComboBox.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите торговую точку", ButtonType.OK).showAndWait();
+            return;
+        }
+        salePointsTableLayout.getChildren().clear();
+        TableView<Nomenclature> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<Nomenclature, String> productName = new TableColumn<>();
+        TableColumn<Nomenclature, Integer> quantity = new TableColumn<>();
+        TableColumn<Nomenclature, Double> price = new TableColumn<>();
+        TableColumn<Nomenclature, Double> discount = new TableColumn<>();
+
+        productName.setText("Наименование товара");
+        quantity.setText("Количество");
+        price.setText("Стоимость");
+        discount.setText("Скидка");
+
+        productName.setCellValueFactory(new PropertyValueFactory<>("ProductName"));
+        quantity.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        price.setCellValueFactory(new PropertyValueFactory<>("Price"));
+        discount.setCellValueFactory(new PropertyValueFactory<>("Discount"));
+
+        price.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.moneyStringConverter));
+        discount.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productDiscountConverter));
+
+        table.getColumns().addAll(List.of(productName, quantity, price, discount));
+
+        try {
+            table.getItems().addAll(salePointService.getNomenclature(salePointComboBox.getSelectionModel().getSelectedItem().getSalePointId()));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+        salePointsTableLayout.getChildren().add(table);
+    }
+
+    @FXML
+    protected void getSalePointsByProductName() {
+        if (productComboBox2.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите товар", ButtonType.OK).showAndWait();
+            return;
+        }
+        TableView<SalePointByProduct> table = initializeSalePointByProductTable();
+        salePointsTableLayout.getChildren().clear();
+
+        try {
+            table.getItems().addAll(salePointService.getSalePointsByProductName(productComboBox2.getSelectionModel().getSelectedItem().getProductName()));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+
+        salePointsTableLayout.getChildren().add(table);
+    }
+
+    @FXML
+    protected void getSalePointsByProductNameAndTypeName() {
+        if (productComboBox2.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите товар", ButtonType.OK).showAndWait();
+            return;
+        }
+        if (salePointTypeComboBox.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите тип торговой точки", ButtonType.OK).showAndWait();
+            return;
+        }
+        salePointsTableLayout.getChildren().clear();
+        TableView<SalePointByProduct> table = initializeSalePointByProductTable();
+
+        try {
+            table.getItems().addAll(salePointService.getSalePointsByProductNameAndTypeName(
+                    productComboBox2.getSelectionModel().getSelectedItem().getProductName(),
+                    salePointTypeComboBox.getSelectionModel().getSelectedItem().getTypeName()
+            ));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+
+        salePointsTableLayout.getChildren().add(table);
+    }
+
+    @FXML
+    protected void getSalePointsByProductNameAndSalePointId() {
+        if (productComboBox2.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите товар", ButtonType.OK).showAndWait();
+            return;
+        }
+        if (salePointComboBox3.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите торговую точку", ButtonType.OK).showAndWait();
+            return;
+        }
+        salePointsTableLayout.getChildren().clear();
+        TableView<SalePointByProduct> table = initializeSalePointByProductTable();
+
+        try {
+            table.getItems().addAll(salePointService.getSalePointsByProductNameAndSalePointId(
+                    productComboBox2.getSelectionModel().getSelectedItem().getProductName(),
+                    salePointComboBox3.getSelectionModel().getSelectedItem().getSalePointId()));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+
+        salePointsTableLayout.getChildren().add(table);
+    }
+
+    private TableView<SalePointByProduct> initializeSalePointByProductTable() {
+        TableView<SalePointByProduct> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<SalePointByProduct, String> salePointName = new TableColumn<>();
+        TableColumn<SalePointByProduct, String> typeName = new TableColumn<>();
+        TableColumn<SalePointByProduct, String> productName = new TableColumn<>();
+        TableColumn<SalePointByProduct, Integer> quantity = new TableColumn<>();
+        TableColumn<SalePointByProduct, Double> price = new TableColumn<>();
+        TableColumn<SalePointByProduct, Double> discount = new TableColumn<>();
+
+        salePointName.setCellValueFactory(new PropertyValueFactory<>("salePointName"));
+        typeName.setCellValueFactory(new PropertyValueFactory<>("typeName"));
+        productName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        price.setCellValueFactory(new PropertyValueFactory<>("price"));
+        discount.setCellValueFactory(new PropertyValueFactory<>("discount"));
+
+        salePointName.setText("Торговая точка");
+        typeName.setText("Тип торговой точки");
+        productName.setText("Наименование товара");
+        quantity.setText("Количество");
+        price.setText("Стоимость");
+        discount.setText("Скидка");
+
+        price.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.moneyStringConverter));
+        discount.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.productDiscountConverter));
+
+        table.getColumns().addAll(List.of(salePointName, typeName, productName, quantity, price, discount));
+
+        return table;
+    }
+
+    @FXML
+    protected void getSalesVolumeByProductId() {
+        if (productComboBox3.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите товар", ButtonType.OK).showAndWait();
+            return;
+        }
+        salePointsTableLayout.getChildren().clear();
+        TableView<SalesVolume> table = initializeSalesVolumeTable();
+
+        try {
+            table.getItems().addAll(salePointService.getSalesVolumeByProductId(productComboBox3.getSelectionModel().getSelectedItem().getProductId()));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+
+        salePointsTableLayout.getChildren().add(table);
+    }
+
+    @FXML
+    protected void getSalesVolumeByProductIdAndSalePointTypeName() {
+        if (productComboBox3.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите товар", ButtonType.OK).showAndWait();
+            return;
+        }
+        if (salePointTypeBox4.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите тип торговой точки", ButtonType.OK).showAndWait();
+            return;
+        }
+        salePointsTableLayout.getChildren().clear();
+        TableView<SalesVolume> table = initializeSalesVolumeTable();
+
+        try {
+            table.getItems().addAll(salePointService.getSalesVolumeByProductIdAndSalePointTypeName(
+                    productComboBox3.getSelectionModel().getSelectedItem().getProductId(),
+                    salePointTypeBox4.getSelectionModel().getSelectedItem().getTypeName()));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+
+        salePointsTableLayout.getChildren().add(table);
+    }
+
+    @FXML
+    protected void getSalesVolumeByProductIdAndSalePointId() {
+        if (productComboBox3.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите товар", ButtonType.OK).showAndWait();
+            return;
+        }
+        if (salePointBox.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите торговую точку", ButtonType.OK).showAndWait();
+            return;
+        }
+        salePointsTableLayout.getChildren().clear();
+        TableView<SalesVolume> table = initializeSalesVolumeTable();
+
+        try {
+            table.getItems().addAll(salePointService.getSalesVolumeByProductIdAndSalePointId(
+                    productComboBox3.getSelectionModel().getSelectedItem().getProductId(),
+                    salePointBox.getSelectionModel().getSelectedItem().getSalePointId()));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+
+        salePointsTableLayout.getChildren().add(table);
+    }
+
+    @FXML
+    protected void getDeliveriesByProductName() {
+        if (productBox.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите товар", ButtonType.OK).showAndWait();
+            return;
+        }
+        if (supplierBox2.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите поставщика", ButtonType.OK).showAndWait();
+            return;
+        }
+        salePointsTableLayout.getChildren().clear();
+        TableView<Deliveries> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<Deliveries, Integer> requestId = new TableColumn<>();
+        TableColumn<Deliveries, String> salePointName = new TableColumn<>();
+        TableColumn<Deliveries, String> typeName = new TableColumn<>();
+        TableColumn<Deliveries, String> productName = new TableColumn<>();
+        TableColumn<Deliveries, Integer> quantity = new TableColumn<>();
+        TableColumn<Deliveries, Double> price = new TableColumn<>();
+
+        requestId.setCellValueFactory(new PropertyValueFactory<>("requestId"));
+        salePointName.setCellValueFactory(new PropertyValueFactory<>("salePointName"));
+        typeName.setCellValueFactory(new PropertyValueFactory<>("typeName"));
+        productName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        price.setCellValueFactory(new PropertyValueFactory<>("price"));
+
+        price.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.moneyStringConverter));
+
+        requestId.setText("Номер заявки");
+        salePointName.setText("Торговая точка");
+        typeName.setText("Тип торговой точки");
+        productName.setText("Наименование товара");
+        quantity.setText("Количество");
+        price.setText("Стоимость");
+
+        table.getColumns().addAll(List.of(requestId, salePointName, typeName, productName, quantity, price));
+
+        try {
+            table.getItems().addAll(consumerService.getDeliveriesByProductName(
+                    productBox.getSelectionModel().getSelectedItem().getProductName(),
+                    supplierBox2.getSelectionModel().getSelectedItem().getSupplierId()));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR ,exception.getMessage(),ButtonType.OK).showAndWait();
+            return;
+        }
+        salePointsTableLayout.getChildren().add(table);
+    }
+
+    private TableView<SalesVolume> initializeSalesVolumeTable() {
+        TableView<SalesVolume> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<SalesVolume, String> salePointName = new TableColumn<>();
+        TableColumn<SalesVolume, Integer> quantity = new TableColumn<>();
+
+        salePointName.setCellValueFactory(new PropertyValueFactory<>("salePointName"));
+        quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+        salePointName.setText("Торговая точка");
+        quantity.setText("Количество");
+
+        table.getColumns().addAll(List.of(salePointName, quantity));
+
+        return table;
+    }
+
+    @FXML
+    protected void salePointsWorkTabSelected() {
+        if (salePointsWorkTab.isSelected()) {
+            salePointsTableLayout.getChildren().clear();
+            salePointComboBox.getItems().clear();
+            salePointComboBox3.getItems().clear();
+            productComboBox3.getItems().clear();
+            salePointTypeBox4.getItems().clear();
+            salePointTypeComboBox.getItems().clear();
+            productComboBox2.getItems().clear();
+            salePointBox.getItems().clear();
+            productBox.getItems().clear();
+            supplierBox2.getItems().clear();
+            try {
+                salePointComboBox.getItems().addAll(salePointService.getSalePoints());
+                salePointComboBox3.getItems().addAll(salePointService.getSalePoints());
+                salePointTypeComboBox.getItems().addAll(salePointTypeService.getSalePointTypes());
+                productComboBox2.getItems().addAll(productService.getProducts());
+                salePointBox.getItems().addAll(salePointService.getSalePoints());
+                salePointTypeBox4.getItems().addAll(salePointTypeService.getSalePointTypes());
+                productComboBox3.getItems().addAll(productService.getProducts());
+                productBox.getItems().addAll(productService.getProducts());
+                supplierBox2.getItems().addAll(supplierService.getSuppliers());
+            } catch (SQLException exception) {
+                new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            }
+        }
+    }
+
 
     /* ***************** ПРОДАВЦЫ ***************** */
     @FXML
@@ -687,6 +1088,10 @@ public class AdminController {
     private ComboBox<Seller> sellersBox;
     @FXML
     private ComboBox<SalePointType> salePointTypeBox2;
+    @FXML
+    private ComboBox<SalePointType> salePointTypeBox3;
+    @FXML
+    private ComboBox<SalePoint> salePointBox2;
 
     @FXML
     protected void getAllSalePointsSellersButtonClick() {
@@ -770,10 +1175,14 @@ public class AdminController {
             salePointTypeBox.getItems().clear();
             salePointTypeBox2.getItems().clear();
             sellersBox.getItems().clear();
+            salePointTypeBox3.getItems().clear();
+            salePointBox2.getItems().clear();
             try {
                 List<SalePointType> types = salePointTypeService.getSalePointTypes();
                 salePointTypeBox.getItems().addAll(types);
                 salePointTypeBox2.getItems().addAll(types);
+                salePointTypeBox3.getItems().addAll(types);
+                salePointBox2.getItems().addAll(salePointService.getSalePoints());
                 List<User> users = userService.getUsers();
 
                 for (User user : users) {
@@ -785,6 +1194,91 @@ public class AdminController {
                 new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
             }
         }
+    }
+
+    @FXML
+    protected void getSellersSalary() {
+        sellersWorkTableLayout.getChildren().clear();
+        TableView<SellerSalary> table = initializeSellerSalaryTable();
+
+        try {
+            table.getItems().addAll(userService.getSellersSalary());
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+
+        sellersWorkTableLayout.getChildren().add(table);
+    }
+
+    @FXML
+    protected void getSellersSalaryBySalePointType() {
+        if (salePointTypeBox3.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите тип торговой точки", ButtonType.OK).showAndWait();
+            return;
+        }
+        sellersWorkTableLayout.getChildren().clear();
+        TableView<SellerSalary> table = initializeSellerSalaryTable();
+
+
+        try {
+            table.getItems().addAll(userService.getSellersSalaryBySalePointType(salePointTypeBox3.getSelectionModel().getSelectedItem().getTypeName()));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+
+        sellersWorkTableLayout.getChildren().add(table);
+    }
+
+    @FXML
+    protected void getSellersSalaryBySalePointId() {
+        if (salePointBox2.getSelectionModel().getSelectedItem() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Выберите торговую точку", ButtonType.OK).showAndWait();
+            return;
+        }
+        sellersWorkTableLayout.getChildren().clear();
+        TableView<SellerSalary> table = initializeSellerSalaryTable();
+
+        try {
+            table.getItems().addAll(userService.getSellersSalaryBySalePointId(salePointBox2.getSelectionModel().getSelectedItem().getSalePointId()));
+        } catch (SQLException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage(), ButtonType.OK).showAndWait();
+            return;
+        }
+
+        sellersWorkTableLayout.getChildren().add(table);
+    }
+
+    private TableView<SellerSalary> initializeSellerSalaryTable() {
+        TableView<SellerSalary> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<SellerSalary, String> salePointName = new TableColumn<>();
+        TableColumn<SellerSalary, String> typeName = new TableColumn<>();
+        TableColumn<SellerSalary, String> firstName = new TableColumn<>();
+        TableColumn<SellerSalary, String> lastName = new TableColumn<>();
+        TableColumn<SellerSalary, String> middleName = new TableColumn<>();
+        TableColumn<SellerSalary, Double> salary = new TableColumn<>();
+
+        salePointName.setCellValueFactory(new PropertyValueFactory<>("salePointName"));
+        typeName.setCellValueFactory(new PropertyValueFactory<>("typeName"));
+        firstName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        lastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        middleName.setCellValueFactory(new PropertyValueFactory<>("middleName"));
+        salary.setCellValueFactory(new PropertyValueFactory<>("salary"));
+
+        salary.setCellFactory(TextFieldTableCell.forTableColumn(StringConverterUtils.moneyStringConverter));
+
+        salePointName.setText("Торговая точка");
+        typeName.setText("Тип торговой точки");
+        firstName.setText("Имя");
+        lastName.setText("Фамилия");
+        middleName.setText("Отчество");
+        salary.setText("Зарплата");
+
+        table.getColumns().addAll(List.of(salePointName, typeName, lastName, firstName, middleName, salary));
+        return table;
     }
 
     private TableView<SalePointsSellers> initializeSellersTable() {
